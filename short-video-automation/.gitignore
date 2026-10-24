@@ -1,0 +1,10 @@
+output/
+.env
+config.json
+client_secret*.json
+youtube_token.json
+tiktok_cookies.txt
+instagram_session.json
+__pycache__/
+*.pyc
+.venv/
