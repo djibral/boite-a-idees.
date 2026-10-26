@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocole Printful → Shopify</title>
+<style>
+:root{--bg:#0d1117;--card:#161d2b;--line:#27314a;--txt:#e7ecf6;--muted:#8f9cb8;--ok:#34c48d;--warn:#f2b544;--bad:#ff6b6b;--accent:#6c8cff}
+@media (prefers-color-scheme:light){:root{--bg:#eef1f8;--card:#fff;--line:#dfe4f0;--txt:#131a26;--muted:#5d6880}}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,sans-serif;padding:16px;max-width:900px;margin-inline:auto}
+h1{font-size:1.4rem}h2{font-size:1.1rem;margin:0 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0}
+label{display:block;padding:3px 0;cursor:pointer}
+small,.muted{color:var(--muted)}
+.tag{font-size:.75rem;padding:1px 8px;border-radius:99px;border:1px solid var(--line)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;vertical-align:top}
+.bar{height:8px;background:var(--line);border-radius:9px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok);width:0}
+</style>
+</head>
+<body>
+<h1>Protocole de création produit — Printful → Shopify</h1>
+<p class="muted">Chaque phase doit être entièrement cochée avant de passer à la suivante. Les cases sont enregistrées dans ce navigateur ; la colonne « Audit » du tableau est mise à jour par la routine à partir des données Shopify.</p>
+<div class="bar"><i id="g"></i></div><p id="gt" class="muted"></p>
+<div id="steps"></div>
+
+<h2>Audit des produits Shopify — dernière vérification : 26/10/2026</h2>
+<p class="muted">Boutique 1par1.fr · 6 produits (3 actifs hors doublons à vérifier, 3 archivés). ✔ = vérifié via Shopify · ? = à contrôler à la main dans Printful (placement, taille logo, fond).</p>
+<div class="card" style="overflow-x:auto"><table>
+<tr><th>Produit</th><th>Statut</th><th>1 Produit/taille</th><th>2 Prix</th><th>3 Tags/desc.</th><th>4 Broderie/impression</th><th>5 Logo (W×H)</th><th>Remarques</th></tr>
+<tr><td>Sweat à Capuche Unisexe — Noir</td><td class="ok">Actif</td><td>✔ S–2XL</td><td>✔ 69,90 €</td><td>✔</td><td>?</td><td>?</td><td>Description : broderie poitrine gauche + impression dorée.</td></tr>
+<tr><td>Sweat à Capuche Unisexe — Marine, Royal &amp; Blanc</td><td class="ok">Actif</td><td>✔ 18 variantes</td><td>✔ 69,90 €</td><td>✔</td><td>?</td><td>?</td><td>Vérifier que les 3 couleurs du titre existent bien dans les variantes.</td></tr>
+<tr><td>Sweat à Capuche Unisexe — Blanc</td><td class="ok">Actif</td><td>✔ S–2XL</td><td>✔ 69,90 €</td><td class="warn">⚠</td><td>?</td><td>?</td><td>Description dit « imprimé » alors que les tags indiquent broderie : harmoniser.</td></tr>
+<tr><td>Unisex Hoodie (×2) · Sweat à Capuche blanc</td><td class="muted">Archivé</td><td>—</td><td class="warn">69,37 / 70,67 €</td><td class="bad">✘ EN, sans tags</td><td>—</td><td>—</td><td>Anciens brouillons : hors vitrine, à supprimer ou garder archivés.</td></tr>
+</table></div>
+
+<script>
+const PHASES=[
+["1. Choix du produit Printful",["Modèle choisi (ex. Unisex Premium Pullover Hoodie)","Couleurs retenues","Tailles retenues (S à 2XL)","Coût de base Printful relevé"]],
+["2. Prix",["Prix de vente fixé (marge ≥ objectif, frais d'envoi inclus)","Même prix sur toutes les variantes (ou écart justifié, ex. 2XL)"]],
+["3. Zones de personnalisation",["Poitrine (avant) : définie","Dos : défini","Manche droite / gauche : définie ou « aucune »","Poignet droit / gauche : défini ou « aucun »","Technique : broderie ou impression (DTG) choisie par zone"]],
+["4. Fichier logo",["Suppression de l'arrière-plan (PNG transparent) si besoin","Largeur (width) et hauteur (height) réglées","Position X / Y centrée, alignement vérifié","Résolution suffisante (≥150 dpi), couleurs de fil vérifiées pour la broderie"]],
+["5. Variantes",["Chaque couleur a son mockup","Chaque variante a un SKU et un prix","Stock géré / non suivi (POD) vérifié"]],
+["6. Fiche Shopify (brouillon)",["Titre en français, sans doublon","Description FR cohérente avec la technique réelle","Images/mockups dans le bon ordre","Tags (broderie, dtg, catalogue…) et type de produit","Collection assignée"]],
+["7. Validation (brouillon → relecture)",["Commande test passée / échantillon contrôlé","Relecture par un 2e membre de l'équipe","Statut « Brouillon » validé"]],
+["8. Publication et mise en vitrine",["Statut Actif","Publié sur la boutique en ligne","Lien produit testé sur mobile","Annoncé à l'équipe"]]];
+const KEY='protocole-printful-v1';let st={};try{st=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+const root=document.getElementById('steps');
+PHASES.forEach((p,i)=>{const d=document.createElement('div');d.className='card';d.innerHTML='<h2>'+p[0]+' <span class="tag" id="t'+i+'"></span></h2>'+
+p[1].map((s,j)=>'<label><input type="checkbox" data-k="'+i+'-'+j+'"'+(st[i+'-'+j]?' checked':'')+'> '+s+'</label>').join('');root.appendChild(d)});
+function upd(){let tot=0,done=0;PHASES.forEach((p,i)=>{let c=0;p[1].forEach((s,j)=>{tot++;if(st[i+'-'+j]){c++;done++}});
+document.getElementById('t'+i).textContent=c+'/'+p[1].length;});
+document.getElementById('g').style.width=(100*done/tot)+'%';document.getElementById('gt').textContent=done+' / '+tot+' étapes validées';}
+root.addEventListener('change',e=>{st[e.target.dataset.k]=e.target.checked;try{localStorage.setItem(KEY,JSON.stringify(st))}catch(x){}upd()});upd();
+</script>
+</body>
+</html>
