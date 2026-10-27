@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protocole Printful → Shopify</title>
+<style>
+:root{--bg:#fff;--fg:#1a1a1a;--mut:#666;--line:#ddd;--ok:#1a7f37;--ko:#b42318;--card:#f7f7f8}
+@media(prefers-color-scheme:dark){:root{--bg:#141414;--fg:#eee;--mut:#999;--line:#333;--card:#1e1e1e;--ok:#4ade80;--ko:#f87171}}
+body{margin:0;padding:16px;background:var(--bg);color:var(--fg);font:15px/1.5 system-ui,sans-serif;max-width:1100px;margin:auto}
+h1{font-size:1.4rem}h2{font-size:1.1rem;margin-top:28px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:12px 0}
+.step{display:flex;gap:8px;align-items:flex-start;padding:4px 0}
+.mut{color:var(--mut);font-size:.85rem}
+.wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.85rem}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:center}
+th:first-child,td:first-child{text-align:left}
+.ok{color:var(--ok)}.ko{color:var(--ko)}
+</style>
+</head>
+<body>
+<h1>Protocole de création produit — Printful → Shopify (1paR'1)</h1>
+<p class="mut">Dernière mise à jour : 27/10/2026. Chaque étape doit être cochée et validée avant de passer à la suivante. Les cases sont mémorisées dans ce navigateur.</p>
+
+<h2>1. Protocole pas à pas</h2>
+<div id="protocol"></div>
+
+<h2>2. Audit des produits Shopify (27/10/2026)</h2>
+<p class="mut">✔ = vérifié automatiquement via Shopify · ? = à contrôler à la main dans Printful (non accessible automatiquement).</p>
+<div class="wrap"><table id="audit"></table></div>
+
+<h2>3. Connecteurs recommandés</h2>
+<div class="card">
+<ul>
+<li><b>Printful ↔ Shopify</b> (app native) : synchronisation produits, variantes, prix, commandes.</li>
+<li><b>Shopify</b> (connecteur Claude) : audit automatique du catalogue, statut, prix, variantes, tags.</li>
+<li><b>Canva</b> : suppression d'arrière-plan et préparation des logos (PNG transparent).</li>
+<li><b>Notion ou monday.com</b> : suivi d'équipe de la checklist, assignation par étape.</li>
+<li><b>Google Sheets</b> : tableau d'audit partagé.</li>
+<li><b>Zapier</b> : alerte quand un produit passe en ACTIF sans checklist complète.</li>
+</ul>
+</div>
+
+<script>
+const STEPS=[
+["A. Choix du produit",["Produit Printful choisi (modèle, fournisseur)","Couleurs retenues","Tailles retenues (S → 2XL)","PRIX de vente défini (marge ≥ objectif)"]],
+["B. Personnalisation",["Technique : broderie / impression (DTG)","Emplacement poitrine / dos","Manche droite / gauche","Poignet droit / gauche","Suppression arrière-plan du logo (si besoin)","Taille logo : width / height réglés","Autres réglages (position, rotation, couleurs de fil)"]],
+["C. Variantes & maquettes",["Variantes créées (couleur × taille)","Maquettes générées pour chaque couleur","Visuel principal correct"]],
+["D. Publication en brouillon",["Titre, description, tags, type produit","Synchronisation Printful → Shopify en DRAFT","Revue croisée par un second membre"]],
+["E. Validation & mise en vente",["Commande test / échantillon contrôlé","Validation finale équipe","Passage en ACTIF et ajout à la collection"]]];
+const P=[ // [nom, statut, [vérifs auto]]
+["Sweat à Capuche Unisexe — Noir","ACTIF"],
+["Sweat à Capuche Unisexe — Marine, Royal & Blanc","ACTIF"],
+["Sweat à Capuche Unisexe — Blanc","ACTIF"],
+["Unisex Hoodie Blanc","ARCHIVÉ"],["Unisex Hoodie","ARCHIVÉ"],["Sweat à Capuche blanc Unisexe","ARCHIVÉ"]];
+const COLS=["Prix 69,90 €","Tailles S–2XL","Tags","Image principale","Type produit","Réglages Printful ?","Maquettes ?"];
+const AUTO={0:[1,1,1,1,1,0,0],1:[1,1,1,0,1,0,0],2:[1,1,1,1,1,0,0],3:[1,1,0,1,1,0,0],4:[1,1,1,1,1,0,0],5:[1,1,0,1,1,0,0]};
+const NOTE={1:"Image principale = logo PNG (grand-dos noir) et non une maquette produit ; 18 variantes annoncées, vérifier couleurs Royal/Blanc."};
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}return null}
+const pr=document.getElementById("protocol");
+STEPS.forEach((s,i)=>{const d=document.createElement("div");d.className="card";d.innerHTML="<b>"+s[0]+"</b>";
+s[1].forEach((t,j)=>{const id="s"+i+"_"+j;const l=document.createElement("label");l.className="step";
+const c=document.createElement("input");c.type="checkbox";c.checked=ls(id)==="1";c.onchange=()=>ls(id,c.checked?"1":"0");
+l.append(c,document.createTextNode(t));d.append(l)});pr.append(d)});
+const t=document.getElementById("audit");
+t.innerHTML="<tr><th>Produit</th><th>Statut</th>"+COLS.map(c=>"<th>"+c+"</th>").join("")+"</tr>"+
+P.map((p,i)=>"<tr><td>"+p[0]+(NOTE[i]?"<div class='mut'>"+NOTE[i]+"</div>":"")+"</td><td>"+p[1]+"</td>"+
+AUTO[i].map((v,k)=>k>=5?"<td>?</td>":v?"<td class='ok'>✔</td>":"<td class='ko'>✘</td>").join("")+"</tr>").join("");
+</script>
+</body>
+</html>
