@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protocole de création produit — Printful × Shopify</title>
+<style>
+:root{--bg:#faf8f5;--fg:#1d1d1f;--mut:#6b6b70;--card:#fff;--ok:#1a7f45;--ko:#b3261e;--wa:#a15c00;--bd:#e4dfd7}
+@media(prefers-color-scheme:dark){:root{--bg:#141416;--fg:#f2f2f2;--mut:#9a9aa0;--card:#1e1e21;--ok:#4cc27e;--ko:#ff7b72;--wa:#e3a33b;--bd:#33333a}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif;padding:16px;max-width:900px;margin:auto}
+h1{font-size:1.5rem}h2{font-size:1.15rem;margin:0 0 8px}.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:14px;margin:12px 0}
+label{display:flex;gap:8px;align-items:flex-start;padding:3px 0}.auto{color:var(--ok)}.warn{color:var(--wa)}.bad{color:var(--ko)}
+small,.mut{color:var(--mut)}table{border-collapse:collapse;width:100%;font-size:.9rem}td,th{border-bottom:1px solid var(--bd);padding:6px;text-align:left;vertical-align:top}
+.scroll{overflow-x:auto}.bar{height:8px;background:var(--bd);border-radius:4px}.bar i{display:block;height:100%;background:var(--ok);border-radius:4px}
+</style></head><body>
+<h1>Protocole de création produit — Printful × Shopify (1paR'1)</h1>
+<p class="mut">Mise à jour : 28/10/2026 · Chaque étape doit être cochée <b>et validée</b> avant la suivante. ✅ = vérifié automatiquement sur Shopify · ☐ = à valider à la main (non lisible depuis Shopify). Les cases manuelles sont mémorisées dans ce navigateur ; pour partager l'état à l'équipe, reporter dans le tableau (Notion / Sheets / monday).</p>
+
+<div class="card"><h2>Avancement global</h2><div class="bar"><i id="g" style="width:0"></i></div><small id="gt"></small></div>
+
+<div id="steps"></div>
+
+<div class="card"><h2>Audit de la boutique (Shopify, 28/10/2026)</h2><div class="scroll"><table id="audit"></table></div>
+<p><b>Alertes :</b></p><ul>
+<li class="warn">Tags <code>broderie</code> + <code>dtg</code> présents ensemble sur les 3 produits actifs alors que « Blanc » est décrit comme <i>imprimé</i> (DTG) et « Noir/Marine » comme <i>brodé</i> : vérifier la technique réelle (étape 4) et corriger les tags.</li>
+<li class="warn">Prix identique 69,90 € partout, aucun prix barré : valider la marge vs coût Printful (étape 3) — coût Printful non lisible depuis Shopify.</li>
+<li class="warn">« Marine, Royal &amp; Blanc » : image principale = <code>1R1_233mm_grand-dos_noir.png</code> (visuel dos noir) ; vérifier qu'elle correspond bien à la couleur affichée.</li>
+<li>3 produits archivés (brouillons/doublons) : conformes à rester hors vitrine.</li></ul></div>
+
+<div class="card"><h2>Meilleurs connecteurs pour automatiser le protocole</h2>
+<table><tr><th>Besoin</th><th>Connecteur</th><th>Statut</th></tr>
+<tr><td>Lire/mettre à jour produits, prix, variantes, collections</td><td><b>Shopify</b></td><td class="auto">connecté — audit automatique</td></tr>
+<tr><td>Suivi d'équipe, cases partagées, statuts par étape</td><td><b>monday.com</b> (ou Notion / Google Sheets)</td><td class="auto">disponible — 1 ligne par produit, 1 colonne par étape</td></tr>
+<tr><td>Détourage fond, redimensionnement logo, mockups</td><td><b>Canva</b> (remove-background, resize)</td><td class="auto">disponible</td></tr>
+<tr><td>Alertes automatiques (nouveau produit → créer la fiche de suivi)</td><td><b>Zapier</b> (Shopify ⇄ Printful ⇄ monday/Sheets)</td><td class="auto">disponible</td></tr>
+<tr><td>Création/synchro produit, placements broderie/impression, tailles de logo, coût</td><td><b>Printful</b> (aucun connecteur MCP) — via Zapier ou API Printful</td><td class="warn">à brancher : étapes 1-6 restent manuelles</td></tr>
+<tr><td>Rappels de revue hebdomadaire</td><td>Google Calendar / Gmail</td><td class="auto">disponible</td></tr></table></div>
+
+<script>
+const S=[
+{t:"1. Choix du produit chez Printful",a:["Produit & modèle choisis (ex. Unisex Premium Pullover Hoodie)","Couleurs retenues","Fournisseur / délais / zones de livraison contrôlés"]},
+{t:"2. Tailles & variantes",a:["Tailles S → 3XL cochées dans Printful","Une variante par couleur × taille","SKU Printful synchronisés avec Shopify"]},
+{t:"3. Prix",a:["Coût Printful (produit + technique + expédition) noté","Prix de vente fixé, marge ≥ objectif","Prix identique/cohérent sur toutes les variantes"]},
+{t:"4. Technique : broderie ou impression (DTG)",a:["Technique choisie par zone (broderie ≠ impression)","Tags Shopify cohérents avec la technique","Description cohérente avec la technique"]},
+{t:"5. Placements",a:["Poitrine (gauche/droite) définie","Dos défini","Manche droite / gauche définie (si besoin)","Poignet droit / gauche défini (si besoin)"]},
+{t:"6. Design / logo",a:["Suppression d'arrière-plan faite (si besoin)","Taille logo réglée : width × height dans Printful","Position X/Y et centrage vérifiés","Résolution et couleurs de fil/encre validées"]},
+{t:"7. Mockups & visuels",a:["Mockups de toutes les couleurs générés","≥ 3 visuels (face, dos, détail) sur Shopify","Image de variante = bonne couleur"]},
+{t:"8. Fiche Shopify",a:["Titre clair","Description FR (matière, technique, entretien)","SEO titre + méta-description","Collections affectées","Statut Actif + canaux de vente publiés"]},
+{t:"9. Validation finale",a:["Commande test passée & produit reçu conforme","Relecture par un 2ᵉ membre de l'équipe","Produit exposé et proposé à la vente"]}];
+// résultats d'audit Shopify automatiques (clé étape-index)
+const AUTO={"2-0":1,"2-1":1,"2-2":1,"3-2":1,"8-0":1,"8-2":1,"8-3":1,"8-4":1,"7-1":1};
+const P=["Noir","Marine/Royal/Blanc","Blanc"];
+const store=(()=>{try{return JSON.parse(localStorage.p||"{}")}catch(e){return{}}})();
+let tot=0,done=0,h="";
+S.forEach((s,i)=>{h+=`<div class="card"><h2>${s.t}</h2>`;s.a.forEach((a,j)=>{const k=i+"-"+j,au=AUTO[k];tot++;const c=au||store[k];if(c)done++;
+h+=`<label><input type="checkbox" data-k="${k}" ${c?"checked":""} ${au?"disabled":""}><span class="${au?"auto":""}">${a}${au?" <small>(✅ vérifié Shopify)</small>":""}</span></label>`});h+="</div>"});
+steps.innerHTML=h;
+function upd(){let d=0;document.querySelectorAll("#steps input").forEach(x=>{if(x.checked)d++});g.style.width=100*d/tot+"%";gt.textContent=d+" / "+tot+" cases validées"}
+steps.onchange=e=>{store[e.target.dataset.k]=e.target.checked;try{localStorage.p=JSON.stringify(store)}catch(_){}upd()};upd();
+const rows=[["Critère",...P],["Statut actif","✅","✅","✅"],["Titre","✅","✅","✅"],["Prix 69,90 €","✅","✅","✅"],["Variantes S→3XL","6","18 (3 coul.)","6"],["Visuels (≥3)","3 ✅","3 ✅","7 ✅"],["SEO titre + description","✅","✅","✅"],["Collections (Accueil + La collection)","✅","✅","✅"],["Publié sur canaux","3 ✅","3 ✅","3 ✅"],["Tags / technique cohérents","⚠️","⚠️","⚠️"],["Placements, logo, mockup, test","☐ manuel","☐ manuel","☐ manuel"]];
+audit.innerHTML=rows.map((r,i)=>"<tr>"+r.map(c=>i?`<td>${c}</td>`:`<th>${c}</th>`).join("")+"</tr>").join("");
+</script></body></html>
