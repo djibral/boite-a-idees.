@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocole Printful → Shopify</title>
+<style>
+:root{--bg:#0d1117;--card:#161d2b;--card2:#1c2434;--line:#27314a;--txt:#e7ecf6;--muted:#8f9cb8;--accent:#6c8cff;--ok:#34c48d;--warn:#f2b544;--bad:#ff6b6b}
+html[data-theme="light"]{--bg:#eef1f8;--card:#fff;--card2:#f6f8fd;--line:#dfe4f0;--txt:#131a26;--muted:#5d6880}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 "Segoe UI",system-ui,sans-serif;padding:16px;max-width:1100px;margin-inline:auto}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 10px}h3{font-size:14px;margin:0}
+.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input[type=text]{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:220px;flex:1}
+button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:8px 12px;cursor:pointer;font:inherit}
+button.ghost{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+.bar{height:8px;background:var(--card2);border-radius:99px;overflow:hidden;min-width:90px}
+.bar>i{display:block;height:100%;background:var(--ok);width:0}
+.phase{border-left:3px solid var(--accent)}
+.phase h3 span{color:var(--accent);margin-right:6px}
+.phase ul{margin:8px 0 0;padding:0;list-style:none}
+.phase li{padding:3px 0}
+.phase small{color:var(--muted)}
+.gate{margin-top:8px;padding:6px 10px;border-radius:8px;background:rgba(52,196,141,.1);color:var(--ok);font-size:13px}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:760px}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:center;font-size:13px}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--card)}
+th{color:var(--muted);font-weight:600}
+th small{display:block;font-weight:400}
+.st{font-weight:600}.st.ok{color:var(--ok)}.st.wip{color:var(--warn)}.st.no{color:var(--muted)}
+.conn{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px}
+.tag{font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.tag.ok{color:var(--ok);border-color:var(--ok)}.tag.warn{color:var(--warn);border-color:var(--warn)}
+input[type=checkbox]{width:17px;height:17px;vertical-align:middle;accent-color:var(--ok)}
+@media(max-width:600px){body{padding:12px}}
+</style>
+</head>
+<body>
+<h1>Protocole de création produit : Printful → Shopify</h1>
+<p class="muted">Chaque étape est cochée puis validée avant de passer à la suivante. Une phase n'est « validée » que lorsque toutes ses cases sont cochées. Dernière mise à jour du protocole : 30/10/2026.</p>
+
+<h2>1. Suivi par produit (vue équipe)</h2>
+<div class="card">
+  <div class="row">
+    <input type="text" id="newName" placeholder="Nom du produit (ex. Hoodie brodé logo poitrine)">
+    <button id="add">Ajouter un produit</button>
+    <button class="ghost" id="export">Exporter (JSON)</button>
+    <button class="ghost" id="import">Importer</button>
+    <button class="ghost" id="theme">Thème</button>
+  </div>
+  <p class="muted" style="margin:8px 0 0">Les coches sont enregistrées dans ce navigateur ; pour partager avec l'équipe, exportez le JSON et commitez-le, ou utilisez le connecteur de suivi (section 3).</p>
+</div>
+<div class="card scroll"><table id="tracker"></table></div>
+
+<h2>2. Le protocole, étape par étape</h2>
+<div id="phases"></div>
+
+<h2>3. Connecteurs recommandés pour automatiser</h2>
+<div class="conn">
+  <div class="card"><h3>Shopify (MCP) <span class="tag warn">à reconnecter</span></h3><p class="muted">Lit les produits publiés (statut, variantes, prix, images, tags) pour cocher automatiquement l'audit de la phase 9 et passer un produit de brouillon à actif.</p></div>
+  <div class="card"><h3>Application Printful pour Shopify <span class="tag">natif</span></h3><p class="muted">Pas de connecteur MCP Printful dans le registre : la synchronisation Printful → Shopify (création du produit, variantes, mockups) passe par l'app Printful installée dans la boutique.</p></div>
+  <div class="card"><h3>Canva (MCP) <span class="tag ok">connecté</span></h3><p class="muted">Suppression d'arrière-plan, redimensionnement du logo, export PNG transparent, kit de marque pour garder des fichiers cohérents.</p></div>
+  <div class="card"><h3>monday.com <span class="tag ok">connecté</span> ou Notion <span class="tag ok">connecté</span></h3><p class="muted">Un tableau « une ligne par produit, une colonne par étape » avec statuts et assignation ; l'équipe voit l'avancement en temps réel. Notion convient mieux si vous voulez une page de procédure vivante.</p></div>
+  <div class="card"><h3>Zapier <span class="tag ok">connecté</span></h3><p class="muted">Automatisations : nouveau produit Shopify en brouillon → ligne créée dans le tableau de suivi + message à l'équipe ; produit publié → case « Publié » cochée. À vérifier : disponibilité d'une action Printful dans Zapier (la recherche « Printful » n'a pas renvoyé d'app dédiée).</p></div>
+  <div class="card"><h3>Google Sheets <span class="tag ok">connecté</span></h3><p class="muted">Alternative légère au tableau de suivi, ou export de l'audit Shopify pour archivage.</p></div>
+</div>
+<p class="muted">Recommandation : Shopify MCP (lecture/audit) + monday.com ou Notion (suivi d'équipe) + Canva (visuels), reliés par Zapier. C'est le minimum pour que les cases se mettent à jour sans saisie manuelle.</p>
+
+<script>
+const PHASES=[
+{t:"Choix du produit chez Printful",items:["Catalogue Printful : modèle exact choisi (marque, référence, grammage, coupe)","Technique retenue : broderie ou impression (DTG / sublimation…), compatible avec le modèle","Coût de base Printful relevé (fournisseur + zone d'impression ou broderie)"],gate:"Produit et technique figés."},
+{t:"Tailles et prix",items:["Tailles disponibles listées (XS → 3XL selon modèle)","Suppléments de taille repérés (tailles hautes parfois plus chères)","Prix de vente fixé : coût produit + frais d'impression + livraison + marge + TVA","Prix psychologique vérifié (x,90 / x,00) et cohérent avec la gamme","Prix de comparaison renseigné si promotion"],gate:"Marge validée par la personne responsable."},
+{t:"Zones de broderie / impression",items:["Poitrine : zone choisie (cœur gauche / droite / centre) ou non utilisée","Dos : zone choisie (haut du dos / pleine largeur) ou non utilisée","Manche droite : utilisée ou non","Manche gauche : utilisée ou non","Poignet droit : utilisé ou non","Poignet gauche : utilisé ou non","Nombre de zones cohérent avec le prix (chaque zone ajoute un coût)"],gate:"Plan des zones écrit (ex. « poitrine gauche + dos »)."},
+{t:"Fichier logo / design",items:["Fichier source en haute résolution (PNG transparent ou vectoriel)","Suppression d'arrière-plan faite si besoin (Canva) et bords propres vérifiés","Broderie : design simplifié (pas de dégradé ni de détail trop fin), couleurs de fils limitées","Impression : résolution suffisante pour la taille d'impression","Nom de fichier clair (produit_zone_version)"],gate:"Fichier approuvé visuellement sur fond clair ET fond sombre."},
+{t:"Réglage du logo (taille et position)",items:["Largeur (width) réglée pour chaque zone","Hauteur (height) réglée en gardant les proportions","Position (haut/bas, gauche/droite) et centrage vérifiés","Taille respectant les limites Printful de la zone et de la technique","Mêmes réglages relevés dans la fiche pour pouvoir les reproduire"],gate:"Valeurs width / height / position notées dans la fiche produit."},
+{t:"Variantes",items:["Couleurs du vêtement choisies (stock Printful vérifié)","Couleur de fil ou d'encre adaptée à chaque couleur de vêtement (contraste)","Toutes les combinaisons taille × couleur créées et activées","Prix vérifié sur chaque variante","SKU présents et uniques"],gate:"Aucune variante vide ou sans prix."},
+{t:"Mockups et visuels",items:["Mockups générés pour chaque couleur principale","Vues avant / dos / manches présentes selon les zones utilisées","Visuel principal choisi (le plus lisible)","Texte alternatif des images renseigné"],gate:"Mockups conformes aux réglages de la phase 5."},
+{t:"Synchronisation vers Shopify (brouillon)",items:["Produit synchronisé via l'application Printful","Statut Shopify = Brouillon (jamais actif à ce stade)","Titre clair avec mots-clés ; description complète (matière, entretien, tailles, technique)","Type de produit, fournisseur (vendor), tags et collection renseignés","Délais et poids/livraison cohérents","Balise SEO (titre, méta-description, handle) renseignée"],gate:"Fiche Shopify complète en brouillon."},
+{t:"Validation finale puis publication",items:["Commande test ou échantillon Printful commandé et reçu (qualité broderie/impression vérifiée)","Relecture croisée par un 2ᵉ membre de l'équipe","Aperçu boutique vérifié sur mobile et ordinateur","Canaux de vente cochés (boutique en ligne, etc.)","Statut passé à Actif : produit exposé et proposé à la vente"],gate:"Validation d'un 2ᵉ membre obligatoire avant publication."},
+{t:"Audit régulier des produits déjà publiés",items:["Liste des produits actifs relue (Shopify) et comparée à ce protocole","Cases cochées dans le tableau pour chaque produit conforme","Produits non conformes remis en « À corriger » avec la phase manquante","Prix et marges recontrôlés après tout changement de coût Printful","Date du dernier audit notée ci-dessous"],gate:"Audit à refaire à fréquence fixe (ex. chaque semaine)."}
+];
+const KEY="protocole-printful-v1";
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=S||{products:[],audit:""};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function tracker(){
+  const t=document.getElementById("tracker");
+  let h="<tr><th>Produit</th>"+PHASES.map((p,i)=>`<th>${i+1}<small>${esc(p.t.split(" ").slice(0,2).join(" "))}</small></th>`).join("")+"<th>Avancement</th><th></th></tr>";
+  S.products.forEach((p,pi)=>{
+    let done=0;
+    const cells=PHASES.map((ph,i)=>{
+      const n=ph.items.length,c=(p.d[i]||[]).filter(Boolean).length;
+      if(c===n)done++;
+      const prev=i===0||(p.d[i-1]||[]).filter(Boolean).length===PHASES[i-1].items.length;
+      const cls=c===n?"ok":c>0?"wip":"no";
+      return `<td><span class="st ${cls}">${c===n?"✓":c+"/"+n}</span></td>`;
+    }).join("");
+    const pct=Math.round(done/PHASES.length*100);
+    h+=`<tr><td>${esc(p.name)}<br><small class="muted">${p.pub?"publié":"non publié"}</small></td>${cells}<td><div class="bar"><i style="width:${pct}%"></i></div>${pct}%</td><td><button class="ghost" data-open="${pi}">Détail</button></td></tr>`;
+  });
+  if(!S.products.length)h+=`<tr><td colspan="${PHASES.length+3}" class="muted">Aucun produit pour l'instant. Ajoutez-en un ci-dessus, ou importez l'audit Shopify.</td></tr>`;
+  t.innerHTML=h;
+  t.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{cur=+b.dataset.open;render();document.getElementById("phases").scrollIntoView()});
+}
+let cur=null;
+function phases(){
+  const el=document.getElementById("phases");
+  const p=cur!=null?S.products[cur]:null;
+  let h=p?`<div class="card"><b>Produit en cours : ${esc(p.name)}</b> <label style="margin-left:12px"><input type="checkbox" id="pub" ${p.pub?"checked":""}> Publié sur Shopify</label> <button class="ghost" id="del" style="float:right">Supprimer</button></div>`
+          :`<p class="muted">Cliquez sur « Détail » d'un produit pour cocher ses étapes. Sans produit sélectionné, les étapes s'affichent en lecture seule.</p>`;
+  let unlocked=true;
+  PHASES.forEach((ph,i)=>{
+    const d=p?(p.d[i]||[]):[];
+    const full=p&&ph.items.every((_,k)=>d[k]);
+    const locked=p&&!unlocked;
+    h+=`<div class="card phase" style="${locked?"opacity:.5":""}"><h3><span>Phase ${i+1}</span>${esc(ph.t)} ${full?'<span class="tag ok">validée</span>':locked?'<span class="tag">verrouillée</span>':""}</h3><ul>`+
+      ph.items.map((it,k)=>`<li><label><input type="checkbox" data-i="${i}" data-k="${k}" ${d[k]?"checked":""} ${(!p||locked)?"disabled":""}> ${esc(it)}</label></li>`).join("")+
+      `</ul><div class="gate">Porte de validation : ${esc(ph.gate)}</div></div>`;
+    if(p&&!full)unlocked=false;
+  });
+  h+=`<div class="card"><b>Dernier audit Shopify :</b> <input type="text" id="audit" value="${esc(S.audit)}" placeholder="ex. 30/10/2026 par …"></div>`;
+  el.innerHTML=h;
+  el.querySelectorAll("input[data-i]").forEach(c=>c.onchange=()=>{const i=+c.dataset.i;(p.d[i]=p.d[i]||[])[+c.dataset.k]=c.checked;save();render()});
+  const pub=document.getElementById("pub");if(pub)pub.onchange=()=>{p.pub=pub.checked;save();render()};
+  const del=document.getElementById("del");if(del)del.onclick=()=>{if(confirm("Supprimer ce produit ?")){S.products.splice(cur,1);cur=null;save();render()}};
+  document.getElementById("audit").onchange=e=>{S.audit=e.target.value;save()};
+}
+function render(){tracker();phases()}
+document.getElementById("add").onclick=()=>{const n=document.getElementById("newName");if(!n.value.trim())return;S.products.push({name:n.value.trim(),pub:false,d:[]});n.value="";cur=S.products.length-1;save();render()};
+document.getElementById("export").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,2)],{type:"application/json"}));a.download="suivi-produits.json";a.click()};
+document.getElementById("import").onclick=()=>{const f=document.createElement("input");f.type="file";f.accept=".json";f.onchange=()=>f.files[0].text().then(t=>{try{S=JSON.parse(t);cur=null;save();render()}catch(e){alert("Fichier invalide")}});f.click()};
+document.getElementById("theme").onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==="dark"?"light":"dark"};
+render();
+</script>
+</body>
+</html>
