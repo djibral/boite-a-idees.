@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocole produit 1paR'1</title>
+<style>
+:root{--bg:#0d1117;--card:#161d2b;--line:#27314a;--txt:#e7ecf6;--muted:#8f9cb8;--ok:#34c48d;--warn:#f2b544;--accent:#6c8cff}
+@media (prefers-color-scheme:light){:root{--bg:#eef1f8;--card:#fff;--line:#dfe4f0;--txt:#131a26;--muted:#5d6880}}
+*{box-sizing:border-box}body{margin:0;padding:16px;background:var(--bg);color:var(--txt);font:14px/1.5 system-ui,sans-serif}
+main{max-width:1000px;margin:auto}h1{font-size:22px}h2{font-size:16px;margin:0 0 6px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.step{display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--line)}
+.step.locked{opacity:.45}.step small{color:var(--muted);display:block}
+.tag{font-size:11px;padding:1px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.manual{color:var(--warn)}button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:6px 12px;cursor:pointer}
+input[type=checkbox]{margin-top:4px;width:16px;height:16px}
+</style>
+</head>
+<body><main>
+<h1>Protocole de création produit — 1paR'1</h1>
+<p>Printful → Shopify. Chaque étape doit être cochée avant la suivante (les suivantes restent verrouillées). Audit Shopify du <b>2026-10-31</b> : les cases préremplies viennent des données Shopify ; celles marquées <span class="manual">manuel</span> se vérifient dans l'éditeur Printful.</p>
+<p><button id="exp">Exporter l'état (JSON)</button> <button id="rst">Réinitialiser</button> <span id="sum" class="tag"></span></p>
+<div id="list"></div>
+<p style="color:var(--muted)">Connecteurs recommandés : voir <code>docs/connecteurs.md</code>. L'état coché est conservé dans ce navigateur ; pour le partager avec l'équipe, exportez le JSON ou committez-le.</p>
+</main>
+<script>
+const STEPS=[
+["choix","1. Produit Printful","Modèle, coloris de base, fournisseur",0],
+["tailles","2. Tailles","S → 2XL disponibles et cohérentes avec le catalogue",0],
+["prix","3. Prix","Coût Printful + marge, TTC, prix identique sur toutes les variantes",0],
+["technique","4. Broderie / impression","DTG ou broderie choisi selon le visuel (tags broderie / dtg)",0],
+["poitrine","5a. Poitrine","Placement et position (gauche/droite)",1],
+["dos","5b. Dos","Placement et position",1],
+["manches","5c. Manches gauche / droite","Si logo prévu : côté, position",1],
+["poignets","5d. Poignets gauche / droite","Si logo prévu : côté, position",1],
+["fond","6. Suppression d'arrière-plan","Logo en PNG transparent, si besoin (Canva remove-background)",1],
+["taille_logo","7. Taille du logo","Width / height / position réglés dans l'éditeur, résolution suffisante",1],
+["fiche_variantes","8. Variantes","Couleurs × tailles, SKU, image par couleur",0],
+["mockup","9. Mockups validés","Aperçus Printful relus un par un",1],
+["fiche_tags","10. Fiche Shopify","Titre, description, type, tags, collection « catalogue », SEO",0],
+["echantillon","11. Échantillon / contrôle qualité","Produit reçu et validé physiquement",1],
+["validation","12. Validation équipe","Une personne autre que le créateur valide",1],
+["publication","13. Publication","Statut ACTIVE sur la boutique",0],
+["vitrine","14. Exposition en vitrine","Visible en collection / page d'accueil, achat testé",1]
+];
+const P=[
+{t:"Unisex Hoodie Blanc",s:"ARCHIVED",p:"69,90 €",v:5,d:["choix","tailles","prix","fiche_variantes"]},
+{t:"Unisex Hoodie",s:"ARCHIVED",p:"69,90 €",v:5,d:["choix","tailles","prix","fiche_variantes","technique"]},
+{t:"Sweat à Capuche Unisexe — Noir",s:"DRAFT",p:"77,90 €",v:5,d:["choix","tailles","prix","fiche_variantes","technique","fiche_tags"]},
+{t:"Sweat à Capuche Unisexe — Marine, Royal & Blanc",s:"DRAFT",p:"77,90 €",v:18,d:["choix","tailles","prix","fiche_variantes","technique","fiche_tags"]},
+{t:"Sweat à Capuche blanc Unisexe",s:"ARCHIVED",p:"69,90 €",v:5,d:["choix","tailles","prix","fiche_variantes"]},
+{t:"Sweat à Capuche Unisexe — Blanc",s:"DRAFT",p:"77,90 €",v:5,d:["choix","tailles","prix","fiche_variantes","technique","fiche_tags"]}
+];
+const K="protocole-1par1-v1";let st;
+try{st=JSON.parse(localStorage.getItem(K))}catch(e){}
+if(!st)st=Object.fromEntries(P.map(p=>[p.t,p.d.slice()]));
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(st))}catch(e){}};
+function render(){
+ const L=document.getElementById("list");L.innerHTML="";let tot=0,dn=0;
+ P.forEach(p=>{
+  const d=st[p.t]||[];const n=d.length;tot+=STEPS.length;dn+=n;
+  const c=document.createElement("div");c.className="card";
+  c.innerHTML=`<h2>${p.t}</h2><span class="tag">Shopify : ${p.s}</span> <span class="tag">${p.p}</span> <span class="tag">${p.v} variantes</span>
+  <div class="bar" style="margin:8px 0"><i style="width:${n/STEPS.length*100}%"></i></div><small>${n}/${STEPS.length} étapes</small>`;
+  let blocked=false;
+  STEPS.forEach(([id,name,desc,man])=>{
+   const on=d.includes(id);const row=document.createElement("label");row.className="step"+(blocked&&!on?" locked":"");
+   row.innerHTML=`<input type="checkbox" ${on?"checked":""} ${blocked&&!on?"disabled":""}><span>${name} ${man?'<span class="tag manual">manuel</span>':""}<small>${desc}</small></span>`;
+   row.querySelector("input").onchange=e=>{
+    let a=st[p.t]||[];
+    if(e.target.checked)a.push(id);else{const i=STEPS.findIndex(s=>s[0]==id);a=a.filter(x=>STEPS.findIndex(s=>s[0]==x)<i)}
+    st[p.t]=a;save();render()};
+   if(!on)blocked=true;c.appendChild(row);
+  });
+  L.appendChild(c);
+ });
+ document.getElementById("sum").textContent=`Équipe : ${dn}/${tot} cases · ${P.filter(p=>(st[p.t]||[]).includes("publication")).length}/${P.length} produits publiés`;
+}
+exp.onclick=()=>{const b=new Blob([JSON.stringify(st,null,1)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="protocole-etat.json";a.click()};
+rst.onclick=()=>{if(confirm("Revenir à l'audit Shopify initial ?")){st=Object.fromEntries(P.map(p=>[p.t,p.d.slice()]));save();render()}};
+render();
+</script>
+</body></html>
