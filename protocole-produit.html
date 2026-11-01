@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocole Produit 1paR'1</title>
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--txt:#131a26;--muted:#5d6880;--line:#dfe4f0;--ok:#1f9d6b;--ko:#d64545;--warn:#c98a10;--accent:#4a63e0}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--card:#161d2b;--txt:#e7ecf6;--muted:#8f9cb8;--line:#27314a;--ok:#34c48d;--ko:#ff6b6b;--warn:#f2b544;--accent:#6c8cff}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:32px 0 10px}
+.sub{color:var(--muted);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.tabs button{border:1px solid var(--line);background:var(--card);color:var(--txt);border-radius:999px;padding:6px 12px;cursor:pointer;font:inherit}
+.tabs button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.step{border-top:1px solid var(--line);padding:10px 0}.step:first-of-type{border-top:0}
+.step h3{margin:0;font-size:15px}
+.step .why{color:var(--muted);font-size:13px;margin:2px 0 6px}
+.chk{display:flex;gap:8px;align-items:flex-start;padding:2px 0;font-size:14px}
+.chk input{margin-top:4px;width:16px;height:16px}
+.tag{font-size:11px;padding:1px 7px;border-radius:99px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.tag.auto{color:var(--accent);border-color:var(--accent)}.tag.ko{color:var(--ko);border-color:var(--ko)}
+.gate{background:rgba(74,99,224,.08);border:1px dashed var(--accent);border-radius:8px;padding:6px 10px;margin-top:6px;font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}.ok{color:var(--ok);font-weight:700}.ko{color:var(--ko);font-weight:700}.na{color:var(--muted)}
+.scroll{overflow-x:auto}
+.note{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+<h1>Protocole de création produit — Printful → Shopify</h1>
+<p class="sub">Boutique 1paR'1 (1par1.fr) · dernière vérification Shopify : <b id="upd"></b> · chaque étape doit être validée avant la suivante.</p>
+
+<div class="card">
+  <b>Comment lire cette page</b>
+  <p class="note" style="margin:6px 0 0"><span class="tag auto">auto</span> = case cochée/décochée par la routine de contrôle à partir des données réelles de Shopify (partagé avec toute l'équipe, mis à jour dans le dépôt). Les cases sans étiquette sont à cocher à la main (mémorisées dans votre navigateur ; pour un suivi partagé, voir le chapitre connecteurs). Aucune donnée Printful n'est lisible automatiquement : ces étapes se valident à la main dans l'éditeur Printful.</p>
+</div>
+
+<h2>1 · Suivi des produits de la boutique</h2>
+<div class="tabs" id="tabs"></div>
+<div id="prodhead" class="card"></div>
+<div id="steps"></div>
+
+<h2>2 · Tableau de conformité (contrôle automatique Shopify)</h2>
+<div class="card scroll"><table id="matrix"></table></div>
+<p class="note">Seuils modifiables dans le bloc de données : marge brute ≥ 50 % du prix TTC, tailles S→3XL, ≥ 1 visuel mockup par couleur (et ≥ 3 visuels), description SEO renseignée, collection et tags renseignés.</p>
+
+<h2>3 · Meilleurs connecteurs pour automatiser</h2>
+<div class="card scroll"><table id="conn"></table></div>
+</main>
+
+<script id="data" type="application/json">
+{
+  "updated": "2026-11-01",
+  "rules": {"marginMin": 0.5, "sizes": ["S","M","L","XL","2XL","3XL"]},
+  "products": [
+    {"id":"12314591199496","name":"Sweat à capuche — Noir","status":"DRAFT","price":77.90,"costMax":34.97,
+     "technique":"Broderie poitrine gauche + impression dorée dos","colors":1,"variants":6,"media":3,"featuredIsMockup":true,
+     "checks":{"titre":true,"prix":true,"marge":true,"tailles":true,"couleurs":true,"mockups":true,"seoDesc":true,"seoTitre":false,"tags":true,"collections":true,"entretien":false,"publie":false},
+     "notes":["Titre SEO absent","Fiche entretien (métaobjet) absente","Non publié (brouillon)"]},
+    {"id":"12320832946440","name":"Sweat à capuche — Marine, Royal & Blanc","status":"DRAFT","price":77.90,"costMax":34.97,
+     "technique":"Broderie","colors":3,"variants":18,"media":3,"featuredIsMockup":false,
+     "checks":{"titre":true,"prix":true,"marge":true,"tailles":true,"couleurs":true,"mockups":false,"seoDesc":true,"seoTitre":false,"tags":true,"collections":true,"entretien":false,"publie":false},
+     "notes":["Image principale = fichier de design (1R1_233mm_grand-dos_noir.png), pas un mockup","3 visuels pour 3 couleurs : 1 mockup par couleur à vérifier","Titre SEO et fiche entretien absents","Non publié (brouillon)"]},
+    {"id":"12347015463176","name":"Sweat à capuche — Blanc","status":"DRAFT","price":77.90,"costMax":34.32,
+     "technique":"Impression (DTG)","colors":1,"variants":6,"media":7,"featuredIsMockup":true,
+     "checks":{"titre":true,"prix":true,"marge":true,"tailles":true,"couleurs":true,"mockups":true,"seoDesc":true,"seoTitre":false,"tags":true,"collections":true,"entretien":true,"publie":false},
+     "notes":["Le produit porte les tags broderie ET dtg alors que la description dit « imprimé » : à harmoniser","Titre SEO absent","Non publié (brouillon)"]}
+  ],
+  "archived": ["Unisex Hoodie Blanc","Unisex Hoodie","Sweat à Capuche blanc Unisexe"],
+  "archivedNote": "3 anciens produits archivés (prix 69,90 €, sans SEO, sans collection) : hors vitrine, non conformes au protocole actuel. Garder archivés ou supprimer."
+}
+</script>
+
+<script>
+const D = JSON.parse(document.getElementById('data').textContent);
+// Étapes du protocole. auto = clé de contrôle Shopify ; sinon case manuelle.
+const STEPS = [
+ {t:"1. Choix du produit Printful",why:"Modèle, fournisseur, délais, qualité : tout découle de ce choix.",
+  items:[["Modèle et fournisseur retenus (ex. sweat capuche unisexe premium)"],["Guide des tailles et composition lus"],["Coût de production relevé pour chaque taille (S→3XL)"]]},
+ {t:"2. Couleurs et tailles",why:"Liste figée avant de créer les variantes.",
+  items:[["Couleurs retenues"],["Tailles S, M, L, XL, 2XL, 3XL","tailles"]]},
+ {t:"3. Prix",why:"Prix TTC, coût Printful, marge. Un prix identique sur toutes les variantes sauf décision contraire.",
+  items:[["Prix de vente TTC fixé","prix"],["Marge brute ≥ 50 % du prix TTC pour toutes les tailles","marge"],["Livraison / seuil de livraison offerte cohérent avec le prix"]]},
+ {t:"4. Technique : broderie ou impression",why:"Broderie = logos simples, peu de couleurs. Impression (DTG) = dégradés, détails fins, dorures.",
+  items:[["Technique choisie par emplacement"],["Nombre de couleurs de fils / limites de la broderie vérifiées"]]},
+ {t:"5. Emplacements",why:"Chaque emplacement activé doit être volontaire (coût et rendu).",
+  items:[["Poitrine (gauche / droite / centre)"],["Dos"],["Manche gauche / manche droite"],["Poignet gauche / poignet droit"],["Emplacements inutiles désactivés"]]},
+ {t:"6. Préparation du logo",why:"Fichier propre = rendu irréprochable.",
+  items:[["Fond transparent (suppression d'arrière-plan si besoin)"],["Format et résolution conformes (PNG, 150 dpi mini à la taille réelle)"],["Version claire / version foncée selon la couleur du vêtement"]]},
+ {t:"7. Taille et position du logo",why:"Réglage dans l'éditeur Printful : width, height, position haut/gauche, centrage.",
+  items:[["Largeur (width) et hauteur (height) notées pour chaque emplacement"],["Position (distance du col / de la couture) notée"],["Proportions verrouillées, aucune déformation"],["Aperçu validé par une seconde personne"]]},
+ {t:"8. Variantes",why:"Chaque couleur × taille est créée, avec le bon SKU et le bon coût.",
+  items:[["Toutes les variantes créées et synchronisées avec Shopify","couleurs"],["Un mockup par couleur","mockups"]]},
+ {t:"9. Fiche produit Shopify",why:"Ce que voit le client.",
+  items:[["Titre clair","titre"],["Description SEO (méta) renseignée","seoDesc"],["Titre SEO renseigné","seoTitre"],["Tags (technique, catalogue)","tags"],["Ajouté aux collections","collections"],["Fiche d'entretien (métaobjet) liée","entretien"]]},
+ {t:"10. Échantillon / commande test",why:"On ne vend jamais ce qu'on n'a pas vu en vrai.",
+  items:[["Échantillon commandé et reçu"],["Rendu broderie / impression validé (photo à l'appui)"]],
+  gate:"Porte de validation n°1 : toute l'étape 10 cochée avant publication."},
+ {t:"11. Relecture et publication",why:"Passer de brouillon à actif, puis exposer.",
+  items:[["Relecture finale par une seconde personne"],["Publié sur la boutique en ligne","publie"],["Visible en vitrine / page d'accueil"],["Commande réelle de bout en bout testée"]],
+  gate:"Porte de validation n°2 : relecture signée avant « Actif »."}
+];
+
+const $ = s => document.querySelector(s);
+$('#upd').textContent = D.updated;
+let cur = 0;
+const key = (p,s,i) => 'pp:'+p.id+':'+s+':'+i;
+const lget = k => { try { return localStorage.getItem(k)==='1' } catch(e){ return false } };
+const lset = (k,v) => { try { localStorage.setItem(k, v?'1':'0') } catch(e){} };
+
+function state(p, it, si, ii){
+  if (it[1]) return {auto:true, ok:!!p.checks[it[1]]};
+  return {auto:false, ok:lget(key(p,si,ii))};
+}
+function progress(p){
+  let n=0,t=0; STEPS.forEach((s,si)=>s.items.forEach((it,ii)=>{t++; if(state(p,it,si,ii).ok) n++;}));
+  return [n,t];
+}
+function render(){
+  $('#tabs').innerHTML = D.products.map((p,i)=>`<button class="${i===cur?'on':''}" data-i="${i}">${p.name} <small>(${progress(p).join('/')})</small></button>`).join('');
+  document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{cur=+b.dataset.i;render()});
+  const p = D.products[cur], [n,t] = progress(p);
+  $('#prodhead').innerHTML = `<b>${p.name}</b> <span class="tag">${p.status==='DRAFT'?'Brouillon':p.status}</span>
+    <div class="note">${p.technique} · ${p.variants} variantes · ${p.media} visuels · ${p.price.toFixed(2).replace('.',',')} € TTC · coût max ${p.costMax.toFixed(2).replace('.',',')} €</div>
+    <div class="bar" style="margin:8px 0 4px"><i style="width:${Math.round(n/t*100)}%"></i></div>
+    <div class="note">${n} cases sur ${t} validées (${Math.round(n/t*100)} %)</div>
+    ${p.notes.length?'<ul class="note" style="margin:6px 0 0;padding-left:18px">'+p.notes.map(x=>'<li>'+x+'</li>').join('')+'</ul>':''}`;
+  $('#steps').innerHTML = '<div class="card">'+STEPS.map((s,si)=>`<div class="step"><h3>${s.t}</h3><div class="why">${s.why}</div>`+
+    s.items.map((it,ii)=>{const st=state(p,it,si,ii);
+      return `<label class="chk"><input type="checkbox" ${st.ok?'checked':''} ${st.auto?'disabled':''} data-k="${key(p,si,ii)}">
+      <span>${it[0]} ${st.auto?'<span class="tag auto">auto</span>':''}${st.auto&&!st.ok?' <span class="tag ko">à corriger</span>':''}</span></label>`}).join('')+
+    (s.gate?`<div class="gate">${s.gate}</div>`:'')+'</div>').join('')+'</div>';
+  document.querySelectorAll('#steps input:not(:disabled)').forEach(c=>c.onchange=()=>{lset(c.dataset.k,c.checked);render()});
+
+  const labels = {titre:"Titre",prix:"Prix",marge:"Marge ≥ 50 %",tailles:"Tailles S→3XL",couleurs:"Variantes",mockups:"Mockups OK",seoDesc:"SEO description",seoTitre:"SEO titre",tags:"Tags",collections:"Collections",entretien:"Entretien",publie:"Publié"};
+  const ks = Object.keys(labels);
+  $('#matrix').innerHTML = '<tr><th>Critère</th>'+D.products.map(p=>`<th>${p.name}</th>`).join('')+'</tr>'+
+    ks.map(k=>`<tr><td>${labels[k]}</td>`+D.products.map(p=>`<td class="${p.checks[k]?'ok':'ko'}">${p.checks[k]?'✔':'✘'}</td>`).join('')+'</tr>').join('')+
+    `<tr><td>Score</td>`+D.products.map(p=>{const v=ks.filter(k=>p.checks[k]).length;return `<td><b>${v}/${ks.length}</b></td>`}).join('')+'</tr>'+
+    `<tr><td colspan="${D.products.length+1}" class="note">${D.archivedNote}</td></tr>`;
+}
+render();
+
+const CONN = [
+ ["Shopify","Déjà connecté","Lecture des produits, prix, coûts, SEO, statuts → alimente les cases « auto ». Peut aussi corriger/publier sur demande.","Indispensable"],
+ ["Zapier","Déjà connecté","Pont Printful ↔ Shopify ↔ Notion/Sheets/Slack. Ex. : produit passé en « Actif » → coche l'étape 11 et prévient l'équipe. Printful a une app Zapier.","Très utile"],
+ ["Notion","Déjà connecté","Base de données partagée « 1 ligne par produit, 1 case par étape » : l'équipe voit l'avancement sans ouvrir ce dépôt (cases vraiment partagées).","Recommandé pour le suivi d'équipe"],
+ ["monday.com","Déjà connecté","Alternative à Notion : tableau avec colonnes d'étapes, statuts et responsables, automatisations de relance.","Alternative"],
+ ["Canva","Déjà connecté","Suppression d'arrière-plan, redimensionnement du logo, export PNG transparent, mockups : couvre l'étape 6 et une partie de la 7.","Très utile"],
+ ["Google Sheets / Drive","Déjà connecté","Journal des tailles de logo (width/height/position) et grille prix-coûts-marges ; stockage des fichiers sources.","Utile"],
+ ["Slack","À reconnecter","Alertes « produit prêt pour relecture » / « marge sous le seuil ». Connexion incomplète actuellement.","Utile après reconnexion"],
+ ["OpenSEO","Connecté, non activé dans cette session","Audit SEO des fiches (titres SEO manquants sur les 3 produits).","Utile"],
+ ["Printful","Aucun connecteur MCP trouvé","L'app Printful native de Shopify reste la source pour emplacements, taille du logo et mockups. À valider à la main, ou via Zapier pour les événements (commande, produit synchronisé).","—"]
+];
+$('#conn').innerHTML = '<tr><th>Connecteur</th><th>État</th><th>Rôle dans le protocole</th><th>Avis</th></tr>'+
+  CONN.map(r=>'<tr>'+r.map((c,i)=>`<td>${i===0?'<b>'+c+'</b>':c}</td>`).join('')+'</tr>').join('');
+</script>
+</body>
+</html>
