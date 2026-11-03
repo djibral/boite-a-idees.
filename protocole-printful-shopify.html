@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocole Printful → Shopify — 1paR'1</title>
+<style>
+:root{--bg:#0d1117;--card:#161d2b;--line:#27314a;--txt:#e7ecf6;--muted:#8f9cb8;--ok:#34c48d;--warn:#f2b544;--bad:#ff6b6b;--accent:#6c8cff}
+@media(prefers-color-scheme:light){:root{--bg:#eef1f8;--card:#fff;--line:#dfe4f0;--txt:#131a26;--muted:#5d6880}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,Segoe UI,sans-serif;padding:16px;max-width:960px;margin:auto}
+h1{font-size:1.4rem}h2{font-size:1.1rem;margin:28px 0 8px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:10px 0}
+.step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+.step:first-of-type{border-top:0}.step.locked{opacity:.45}
+.step small{color:var(--muted);display:block}
+.bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.tag{font-size:.75rem;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.ACTIVE{color:var(--ok)}.DRAFT{color:var(--warn)}.ARCHIVED{color:var(--bad)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}td,th{border-bottom:1px solid var(--line);padding:6px;text-align:left;vertical-align:top}
+.auto{color:var(--ok)}.manual{color:var(--warn)}.ko{color:var(--bad)}
+input[type=checkbox]{width:20px;height:20px;margin-top:2px;flex:none}
+button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:8px 12px;cursor:pointer}
+select{padding:6px;border-radius:8px;background:var(--card);color:var(--txt);border:1px solid var(--line)}
+</style>
+</head>
+<body>
+<h1>Protocole de création produit — Printful → Shopify</h1>
+<p style="color:var(--muted)">Chaque étape doit être cochée <b>dans l'ordre</b> : la suivante reste verrouillée tant que la précédente n'est pas validée. Les cases sont enregistrées dans ce navigateur (export/import JSON pour partager avec l'équipe). Dernière mise à jour de l'audit Shopify : <b>2026-11-03</b>.</p>
+
+<h2>1. État de la boutique (audit automatique)</h2>
+<div class="card" id="audit"></div>
+
+<h2>2. Checklist étape par étape</h2>
+<div class="card">
+  <label>Produit : <select id="prod"></select></label>
+  <button id="export">Exporter</button> <button id="import">Importer</button>
+  <div class="bar" style="margin-top:10px"><i id="barfill" style="width:0"></i></div>
+  <small id="pct" style="color:var(--muted)"></small>
+</div>
+<div id="steps"></div>
+
+<h2>3. Connecteurs recommandés</h2>
+<div class="card">
+<table>
+<tr><th>Rôle</th><th>Connecteur</th><th>Statut ici</th></tr>
+<tr><td>Boutique (lecture/maj produits, statut, prix)</td><td>Shopify</td><td class="auto">Connecté — utilisé pour l'audit</td></tr>
+<tr><td>Fabrication / mockups / broderie-DTG</td><td>App Printful pour Shopify (sync natif)</td><td class="manual">Pas de connecteur Printful dans Zapier ni MCP ici ; passer par l'app Printful + son API</td></tr>
+<tr><td>Visuels / logo / suppression d'arrière-plan</td><td>Canva (remove-background, resize)</td><td class="auto">Disponible</td></tr>
+<tr><td>Suivi d'équipe en direct</td><td>monday.com ou Notion (un item par produit, une colonne par étape)</td><td class="auto">Disponibles</td></tr>
+<tr><td>Tableau de bord partagé</td><td>Google Sheets</td><td class="auto">Disponible</td></tr>
+<tr><td>Mise à jour planifiée de l'audit</td><td>Routine planifiée (ce run) + notification</td><td class="auto">En place</td></tr>
+</table>
+<p style="color:var(--muted)">Recommandation : Shopify + app Printful pour la production, Canva pour les visuels, monday.com pour que toute l'équipe voie les cases cochées. Ajouter l'API Printful (clé privée côté serveur, jamais dans ce fichier) pour automatiser les contrôles « placement / taille logo ».</p>
+</div>
+
+<script>
+const PRODUCTS=[
+ {id:"12314591199496",t:"Sweat à Capuche Unisexe — Noir",s:"DRAFT",price:"77,90 €",tags:"broderie, catalogue, dtg",sku:"4285107_*",img:1,desc:1,vendor:"1paR'1"},
+ {id:"12347015463176",t:"Sweat à Capuche Unisexe — Blanc",s:"DRAFT",price:"69,90 €",tags:"broderie, catalogue, dtg",sku:"8116722_*",img:1,desc:1,vendor:"1paR'1"},
+ {id:"12303774875912",t:"Unisex Hoodie Blanc",s:"ARCHIVED",price:"69,90 €",tags:"—",sku:"8060518_*",img:1,desc:1,vendor:"1paR'1"},
+ {id:"12303775203592",t:"Unisex Hoodie",s:"ARCHIVED",price:"69,90 €",tags:"broderie, dtg",sku:"6159261_*",img:1,desc:1,vendor:"1paR'1"},
+ {id:"12346956054792",t:"Sweat à Capuche blanc Unisexe",s:"ARCHIVED",price:"69,90 €",tags:"—",sku:"4937855_*",img:1,desc:1,vendor:"1paR1 (apostrophe manquante)"}
+];
+const STEPS=[
+ ["Choix du produit Printful","Modèle de base (ex. Unisex Premium Pullover Hoodie), couleur, qualité."],
+ ["Tailles","S, M, L, XL, 2XL (+ autres si besoin) — toutes les variantes présentes."],
+ ["Prix","Coût Printful + marge + TVA ; prix identique sur toutes les tailles ; cohérent avec le catalogue."],
+ ["Technique : broderie / impression (DTG)","Choisir par emplacement ; vérifier limites de couleurs/points de la broderie."],
+ ["Emplacement poitrine / dos","Poitrine gauche, dos, etc. — un fichier par emplacement."],
+ ["Manches (droite / gauche)","Activer seulement si prévu ; fichier distinct par manche."],
+ ["Poignets (droite / gauche)","Activer seulement si prévu."],
+ ["Suppression d'arrière-plan","Logo en PNG transparent (Canva : remove-background) — aucun fond résiduel."],
+ ["Taille du logo","Réglage width / height / position (top, left) ; marges et centrage ; résolution ≥ 150 dpi."],
+ ["Variantes & couleurs","Mockups de chaque couleur/taille ; SKU Printful bien liés ; photo principale correcte."],
+ ["Mockups & visuels","Face / dos / détail ; ordre des images ; texte alternatif."],
+ ["Fiche Shopify","Titre, description, type, vendeur (« 1paR'1 »), tags, collection, SEO."],
+ ["Commande test","Commande d'échantillon Printful : contrôle qualité réel (couleur, placement, finition)."],
+ ["Validation équipe","Relecture croisée par une 2ᵉ personne."],
+ ["Publication & vitrine","Statut ACTIVE, publié sur le canal en ligne, visible en collection ; contrôle final côté client."]
+];
+const KEY="protocole-1par1-v1";
+let state={};try{state=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
+const sel=document.getElementById("prod");
+PRODUCTS.forEach(p=>sel.add(new Option(p.t+" ["+p.s+"]",p.id)));
+document.getElementById("audit").innerHTML=
+ "<p>Boutique <b>1par1.fr</b> — "+PRODUCTS.length+" produits : <b class='ACTIVE'>0 actif</b>, <b class='DRAFT'>2 brouillons</b>, <b class='ARCHIVED'>3 archivés</b>. <b>Aucun produit n'est encore publié en vitrine.</b></p>"+
+ "<table><tr><th>Produit</th><th>Statut</th><th>Prix</th><th>Tags</th><th>Contrôles auto Shopify</th></tr>"+
+ PRODUCTS.map(p=>"<tr><td>"+p.t+"</td><td class='"+p.s+"'>"+p.s+"</td><td>"+p.price+"</td><td>"+p.tags+"</td><td>"+
+  "<span class='auto'>✔ image, description, variantes S–2XL, SKU</span><br>"+
+  (p.vendor.indexOf("manquante")>0?"<span class='ko'>✘ vendeur : "+p.vendor+"</span><br>":"")+
+  (p.s!="ACTIVE"?"<span class='ko'>✘ non publié (étape 15)</span><br>":"")+
+  "<span class='manual'>? placement, taille logo, fond : contrôle manuel</span></td></tr>").join("")+"</table>"+
+ "<p style='color:var(--muted)'>Points à corriger : unifier le vendeur de « Sweat à Capuche blanc Unisexe » ; l'API ne renvoyait que 5 variantes sur 6 annoncées — vérifier la 6ᵉ ; tags « broderie » et « dtg » ensemble : confirmer la technique par emplacement ; le Noir (77,90 €) et le Blanc (69,90 €) ont des prix différents — confirmer que c'est voulu.</p>";
+function render(){
+ const pid=sel.value,st=state[pid]||(state[pid]=Array(STEPS.length).fill(false));
+ let done=0,open=false;
+ document.getElementById("steps").innerHTML="<div class='card'>"+STEPS.map((s,i)=>{
+  const ok=st[i];if(ok)done++;
+  const locked=!ok&&i>0&&!st[i-1];
+  return "<div class='step"+(locked?" locked":"")+"'><input type='checkbox' data-i='"+i+"' "+(ok?"checked":"")+(locked?" disabled":"")+"><div><b>"+(i+1)+". "+s[0]+"</b><small>"+s[1]+"</small></div></div>";
+ }).join("")+"</div>";
+ const pct=Math.round(done/STEPS.length*100);
+ barfill.style.width=pct+"%";document.getElementById("pct").textContent=done+" / "+STEPS.length+" étapes validées ("+pct+" %)";
+ document.querySelectorAll("#steps input").forEach(c=>c.onchange=()=>{
+  const i=+c.dataset.i;st[i]=c.checked;
+  if(!c.checked)for(let j=i+1;j<STEPS.length;j++)st[j]=false; // décocher invalide les suivantes
+  save();render();
+ });
+}
+sel.onchange=render;
+document.getElementById("export").onclick=()=>{prompt("Copiez ce JSON :",JSON.stringify(state))};
+document.getElementById("import").onclick=()=>{const v=prompt("Collez le JSON :");if(v)try{state=JSON.parse(v);save();render()}catch(e){alert("JSON invalide")}};
+render();
+</script>
+</body>
+</html>
