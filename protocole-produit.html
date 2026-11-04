@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocole de création produit — 1paR'1</title>
+<style>
+:root{--bg:#0d1117;--card:#161d2b;--line:#27314a;--txt:#e7ecf6;--muted:#8f9cb8;--accent:#6c8cff;--ok:#34c48d;--warn:#f2b544;--bad:#ff6b6b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 system-ui,"Segoe UI",sans-serif}
+main{max-width:1000px;margin:0 auto;padding:16px}h1{font-size:22px}h2{font-size:17px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.muted{color:var(--muted)}a{color:var(--accent)}
+select,button{background:#1c2434;color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font:inherit}
+.step{border-left:3px solid var(--line);padding-left:10px;margin:10px 0}.step.done{border-color:var(--ok)}.step.locked{opacity:.45}
+.step h3{margin:0 0 6px;font-size:15px}label{display:flex;gap:8px;align-items:flex-start;padding:4px 0;cursor:pointer}
+input[type=checkbox]{margin-top:4px;width:16px;height:16px}
+.bar{height:8px;background:#222c3f;border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok)}
+.badge{font-size:11px;border-radius:99px;padding:2px 8px;border:1px solid var(--line)}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}
+table{width:100%;border-collapse:collapse}td,th{padding:6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.auto{font-size:11px;color:var(--info,#4cc9f0)}
+</style>
+</head>
+<body><main>
+<h1>Protocole de création produit — 1paR'1</h1>
+<p class="muted">Du choix du produit chez Printful jusqu'à la mise en vente sur Shopify. Chaque étape doit être cochée entièrement avant de passer à la suivante (les étapes suivantes restent verrouillées). Les coches sont enregistrées dans ce navigateur ; le tableau « État de la boutique » est mis à jour par la routine automatique.</p>
+
+<div class="card"><h2>État de la boutique <span class="muted" id="audit-date"></span></h2><div id="audit"></div></div>
+
+<div class="card"><label style="display:block">Produit à suivre :
+<select id="prod"></select></label>
+<p><b id="pct">0 %</b> <span class="muted">validé</span></p><div class="bar"><i id="barfill" style="width:0"></i></div>
+<button id="reset" style="margin-top:8px">Réinitialiser ce produit</button></div>
+
+<div id="steps"></div>
+
+<div class="card"><h2>Connecteurs recommandés pour automatiser</h2>
+<table>
+<tr><th>Connecteur</th><th>Rôle dans le protocole</th><th>Statut</th></tr>
+<tr><td>Shopify</td><td>Lire/mettre à jour les produits, prix, variantes, collections, statut ; base de l'audit automatique</td><td class="ok">Connecté</td></tr>
+<tr><td>Notion ou monday.com</td><td>Tableau d'équipe : une ligne par produit, une colonne par étape, statut Brouillon → Test → Validé → Publié</td><td class="warn">Disponible dans ce compte, à brancher</td></tr>
+<tr><td>Canva</td><td>Préparer le logo, supprimer l'arrière-plan, exporter en PNG transparent</td><td class="warn">Disponible dans ce compte, à brancher</td></tr>
+<tr><td>Zapier</td><td>Printful ↔ Shopify ↔ Notion/Sheets : alerte à chaque nouveau produit, création automatique de la fiche de suivi</td><td class="warn">Disponible dans ce compte, à brancher</td></tr>
+<tr><td>Google Sheets / Drive</td><td>Export du suivi et archivage des maquettes</td><td class="ok">Connecté</td></tr>
+<tr><td>Printful</td><td>Pas de connecteur dédié trouvé dans l'annuaire : passer par l'app Printful dans Shopify, et Zapier pour les automatisations</td><td class="bad">Aucun connecteur direct</td></tr>
+</table></div>
+</main>
+<script>
+const STEPS=[
+{t:"1. Choix du produit (Printful)",i:["Modèle choisi dans le catalogue Printful (marque, qualité, grammage)","Couleurs retenues","Tailles retenues (S → 3XL si annoncé)","Coût de revient Printful relevé (produit + impression/broderie + livraison)"]},
+{t:"2. Prix",i:["Prix de vente fixé avec marge calculée","Même prix sur toutes les variantes (sauf surcoût de taille volontaire)","Prix cohérent avec la meta-description SEO et la page produit"]},
+{t:"3. Technique : broderie / impression",i:["Technique choisie par emplacement (broderie, DTG, etc.)","Tags techniques ajoutés sur le produit (broderie, dtg…)","Couleurs de fil / d'encre validées"]},
+{t:"4. Emplacements du logo",i:["Poitrine (gauche / droite / centre)","Dos","Manche droite","Manche gauche","Poignet droit","Poignet gauche","Emplacements inutilisés explicitement désactivés"]},
+{t:"5. Fichier logo",i:["Arrière-plan supprimé si besoin (PNG transparent)","Résolution suffisante (300 dpi à la taille d'impression)","Un fichier distinct par emplacement vérifié"]},
+{t:"6. Taille et position du logo",i:["Largeur (width) réglée","Hauteur (height) réglée","Position X / Y vérifiée (centrage, distance du col)","Limites de la zone d'impression respectées","Aperçu / maquette Printful contrôlé sur chaque emplacement"]},
+{t:"7. Variantes",i:["Toutes les tailles présentes et SKU rattachés à Printful","Toutes les couleurs présentes","Une image de maquette par couleur","Stock / disponibilité (à la demande) correct"]},
+{t:"8. Fiche Shopify",i:["Titre clair et unique","Description complète (matière, entretien, tailles)","Images de maquette (face, dos, détails) sans erreur","Type de produit, vendeur, tags renseignés","Collection(s) assignée(s)","Titre et méta-description SEO renseignés","Guide des tailles / informations d'entretien"]},
+{t:"9. Test (statut Brouillon)",i:["Commande test passée et vérifiée","Échantillon reçu / contrôlé (qualité, position du logo)","Relecture par un 2e membre de l'équipe"]},
+{t:"10. Validation et publication",i:["Validation finale signée par le responsable","Statut passé à Actif","Publié sur la boutique en ligne et visible en vitrine","Vérification de la page publique (mobile et ordinateur)"]}
+];
+// Audit automatique (Shopify, 2026-11-04). true = vérifié automatiquement.
+const AUDIT_DATE="2026-11-04";
+const PRODUCTS=[
+{n:"Sweat à Capuche Unisexe — Noir",s:"BROUILLON",auto:{"2.0":0,"2.1":1,"2.2":0,"3.1":1,"7.0":0,"7.3":1,"8.0":1,"8.3":1,"8.4":1,"8.5":1,"8.6":0},
+ notes:["Prix 77,90 € sur toutes les variantes, cohérent avec le SEO","Variantes S → 2XL listées alors que le SEO annonce jusqu'au 3XL : à vérifier","Collections : Page d'accueil, La collection","Statut Brouillon, non publié"]},
+{n:"Sweat à Capuche Unisexe — Blanc",s:"BROUILLON",auto:{"2.1":1,"3.1":1,"7.3":1,"8.0":1,"8.3":1,"8.4":1,"8.5":1,"8.6":1},
+ notes:["INCOHÉRENCE : prix variantes 69,90 € mais la méta-description SEO annonce 77,90 €","Variantes S → 2XL listées alors que le SEO annonce jusqu'au 3XL : à vérifier","7 images, consigne d'entretien présente","Statut Brouillon, non publié"]},
+{n:"Unisex Hoodie / Unisex Hoodie Blanc / Sweat à Capuche blanc Unisexe",s:"ARCHIVÉS (3 anciens produits)",auto:{},
+ notes:["Anciennes versions archivées : sans collection, sans SEO, titres non conformes","À ne pas republier ; recréer via le protocole si besoin"]}
+];
+const KEY="protocole1par1", $=s=>document.querySelector(s);
+let state={}; try{state=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+const sel=$("#prod"); PRODUCTS.forEach((p,i)=>sel.add(new Option(p.n,i)));
+sel.value=localStorage.getItem(KEY+"_sel")||0; if(!sel.value)sel.value=0;
+function get(p,k){const m=state[p]||{};return k in m?m[k]:!!(PRODUCTS[p].auto[k])}
+function render(){
+ const p=+sel.value;try{localStorage.setItem(KEY+"_sel",p)}catch(e){}
+ let total=0,done=0,prevDone=true,h="";
+ STEPS.forEach((st,si)=>{
+  const ok=st.i.every((_,ii)=>get(p,si+"."+ii)); const locked=!prevDone;
+  h+=`<div class="card step ${ok?"done":""} ${locked?"locked":""}"><h3>${st.t} ${ok?'<span class="badge ok">validée</span>':locked?'<span class="badge">verrouillée</span>':'<span class="badge warn">en cours</span>'}</h3>`;
+  st.i.forEach((it,ii)=>{const k=si+"."+ii,c=get(p,k);total++;if(c)done++;
+   h+=`<label><input type="checkbox" data-k="${k}" ${c?"checked":""} ${locked?"disabled":""}><span>${it}${PRODUCTS[p].auto[k]&&!(state[p]&&k in state[p])?' <span class="auto">(vérifié automatiquement)</span>':""}</span></label>`});
+  h+="</div>"; prevDone=prevDone&&ok;});
+ $("#steps").innerHTML=h;const pc=Math.round(done/total*100);$("#pct").textContent=pc+" %";$("#barfill").style.width=pc+"%";
+ document.querySelectorAll("input[data-k]").forEach(e=>e.onchange=()=>{(state[p]=state[p]||{})[e.dataset.k]=e.checked;try{localStorage.setItem(KEY,JSON.stringify(state))}catch(x){}render()});
+}
+$("#reset").onclick=()=>{delete state[+sel.value];try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}render()};
+sel.onchange=render;
+$("#audit-date").textContent="— mis à jour le "+AUDIT_DATE;
+$("#audit").innerHTML=PRODUCTS.map(p=>`<h3 style="margin:10px 0 2px">${p.n} <span class="badge">${p.s}</span></h3><ul>${p.notes.map(n=>`<li class="${/INCOH|à vérifier/.test(n)?"warn":""}">${n}</li>`).join("")}</ul>`).join("")+
+ '<p class="muted">Aucun produit n\'est encore publié : les 10 étapes restent à valider avant la mise en vitrine. Les étapes Printful (emplacements, taille du logo) ne sont pas lisibles depuis Shopify : à cocher manuellement.</p>';
+render();
+</script></body></html>
