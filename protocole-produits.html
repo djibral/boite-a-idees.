@@ -55,6 +55,6 @@ const root=document.getElementById('steps');let total=0;
 STEPS.forEach((s,i)=>{const d=document.createElement('div');d.className='card';d.innerHTML='<b>Étape '+(i+1)+' — '+s[0]+'</b>';
 s[1].forEach((t,j)=>{total++;const id=i+'-'+j;const l=document.createElement('label');l.innerHTML='<input type="checkbox" '+(st[id]?'checked':'')+'> '+t;
 l.firstChild.onchange=e=>{st[id]=e.target.checked;try{localStorage.setItem(key,JSON.stringify(st))}catch(_){}upd()};d.appendChild(l)});root.appendChild(d)});
-function upd(){const n=Object.values(st).filter(Boolean).length;document.getElementById('pb').firstChild.style.width=(100*n/total)+'%';document.getElementById('pt').textContent=n+' / '+total+' points validés'}
+function upd(){const n=Object.values(st).filter(Boolean).length;document.getElementById('pb').style.width=(100*n/total)+'%';document.getElementById('pt').textContent=n+' / '+total+' points validés'}
 upd();
 </script></body></html>
