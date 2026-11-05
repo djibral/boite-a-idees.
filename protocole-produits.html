@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Protocole Produits Printful → Shopify</title>
+<style>
+:root{--bg:#0d1117;--card:#161d2b;--line:#27314a;--txt:#e7ecf6;--muted:#8f9cb8;--ok:#34c48d;--warn:#f2b544;--bad:#ff6b6b;--acc:#6c8cff}
+@media(prefers-color-scheme:light){:root{--bg:#eef1f8;--card:#fff;--line:#dfe4f0;--txt:#131a26;--muted:#5d6880}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,sans-serif;padding:16px;max-width:980px;margin:auto}
+h1{font-size:22px}h2{font-size:17px;margin:28px 0 8px}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0}
+.muted{color:var(--muted);font-size:13px}label{display:flex;gap:8px;align-items:flex-start;padding:4px 0}
+table{width:100%;border-collapse:collapse;font-size:13px;display:block;overflow-x:auto}th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;white-space:nowrap}
+.ok{color:var(--ok)}.ko{color:var(--bad)}.td{color:var(--warn)}.bar{height:8px;background:var(--line);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok);width:0}
+</style></head><body>
+<h1>Protocole de création produit — Printful → Shopify (1paR'1)</h1>
+<p class="muted">Dernière mise à jour automatique : 05/11/2026. Chaque étape doit être cochée et validée avant de passer à la suivante. Les cases sont mémorisées dans ce navigateur ; pour le suivi d'équipe, reporter l'état dans l'outil partagé (voir « Connecteurs »).</p>
+
+<h2>1. Protocole étape par étape (à appliquer à chaque produit)</h2>
+<div class="bar"><i id="pb"></i></div><p class="muted" id="pt"></p>
+<div id="steps"></div>
+
+<h2>2. Audit de la boutique Shopify (1par1.fr) — 05/11/2026</h2>
+<p class="muted">Données lues en direct via le connecteur Shopify. ✔ = vérifié automatiquement, ❓ = à contrôler à la main dans Printful (emplacements, taille du logo, fond supprimé).</p>
+<table><tr><th>Produit</th><th>Statut</th><th>Prix</th><th>Variantes</th><th>Image</th><th>Tags broderie/dtg</th><th>Emplacements / logo / fond</th><th>Prêt à publier ?</th></tr>
+<tr><td>Sweat à Capuche Unisexe — Noir</td><td class="td">BROUILLON</td><td class="ok">✔ 77,90 €</td><td class="ok">✔ S–2XL (5)</td><td class="ok">✔</td><td class="ok">✔</td><td>❓</td><td class="td">Après validation manuelle</td></tr>
+<tr><td>Sweat à Capuche Unisexe — Blanc</td><td class="td">BROUILLON</td><td class="ok">✔ 69,90 €</td><td class="ok">✔ S–2XL (5)</td><td class="ok">✔</td><td class="ok">✔</td><td>❓</td><td class="td">Après validation manuelle (prix ≠ version Noir 77,90 € : à harmoniser ?)</td></tr>
+<tr><td>Unisex Hoodie Blanc</td><td>ARCHIVÉ</td><td class="ok">✔ 69,90 €</td><td class="ok">✔</td><td class="ok">✔</td><td class="ko">✘ aucun tag</td><td>❓</td><td>Non (archivé)</td></tr>
+<tr><td>Unisex Hoodie</td><td>ARCHIVÉ</td><td class="ok">✔ 69,90 €</td><td class="ok">✔</td><td class="ok">✔</td><td class="ok">✔</td><td>❓</td><td>Non (archivé, titre non francisé)</td></tr>
+<tr><td>Sweat à Capuche blanc Unisexe</td><td>ARCHIVÉ</td><td class="ok">✔ 69,90 €</td><td class="ok">✔</td><td class="ok">✔</td><td class="ko">✘ aucun tag</td><td>❓</td><td>Non (archivé)</td></tr></table>
+<p class="muted"><b>Constat :</b> aucun produit n'est actuellement ACTIF sur la vitrine (2 brouillons, 3 archivés). Remarque : 5 variantes seulement (S, M, L, XL, 2XL) sont listées par produit alors que le comptage indique 6 : vérifier la variante manquante (ex. 3XL ou doublon).</p>
+
+<h2>3. Connecteurs recommandés pour automatiser</h2>
+<div class="card"><b>Déjà connectés à cet environnement</b><ul>
+<li><b>Shopify</b> — lecture/maj produits, statuts, collections : audit automatique de la vitrine (utilisé ici).</li>
+<li><b>Zapier</b> — relier Printful ↔ Shopify ↔ tableau de suivi (ex. « nouveau produit Shopify » → ligne dans Google Sheets / Notion avec cases à cocher).</li>
+<li><b>Notion</b> ou <b>monday.com</b> — base « Produits » avec une colonne case à cocher par étape, visible de toute l'équipe.</li>
+<li><b>Google Sheets / Drive</b> — alternative simple : une ligne par produit, une colonne par étape.</li>
+<li><b>Canva</b> — suppression d'arrière-plan et redimensionnement des logos (étape 5-6).</li>
+<li><b>Vercel / Netlify / GitHub</b> — héberger cette page de protocole pour l'équipe.</li></ul>
+<b>À ajouter</b> : l'application <b>Printful</b> (intégration native Shopify) pour la synchronisation des variantes, prix et mockups ; Printful n'est pas exposé en connecteur direct ici, la gestion des emplacements et du logo reste donc manuelle dans l'éditeur Printful.</div>
+
+<script>
+const STEPS=[
+["Choix du produit Printful",["Produit et modèle choisis (ex. Unisex Premium Pullover Hoodie)","Couleur(s) définies","Fournisseur / délai de production vérifiés"]],
+["Tailles & variantes",["Toutes les tailles activées (S–2XL, +3XL si besoin)","Aucune variante en doublon ou manquante","SKU générés par Printful présents"]],
+["Prix",["Coût Printful + livraison relevé","Marge calculée et prix TTC défini","Prix identique sur toutes les variantes (ou écart justifié)"]],
+["Technique : broderie / impression",["Technique choisie par emplacement (broderie ou DTG)","Tags « broderie » / « dtg » ajoutés sur Shopify"]],
+["Emplacements",["Poitrine / dos","Manche droite / gauche","Poignet droit / gauche","Aucun emplacement inutile actif (coût)"]],
+["Fichier logo",["Arrière-plan supprimé si besoin (PNG transparent)","Résolution suffisante vérifiée","Couleurs conformes à la technique (broderie : nb de fils limité)"]],
+["Réglage du logo",["Largeur (width) réglée","Hauteur (height) réglée","Position (haut/gauche) centrée et symétrique","Aperçu mockup contrôlé sur chaque couleur"]],
+["Fiche Shopify",["Titre en français","Description complète","Images mockup dans le bon ordre","Type de produit, tags, collection"]],
+["Validation interne (brouillon)",["Relecture par un 2e membre de l'équipe","Commande test / échantillon contrôlé"]],
+["Publication & exposition",["Statut passé à ACTIF","Ajouté à la collection vitrine","Visible sur le canal de vente en ligne","Lien produit testé"]]
+];
+const key='proto-1par1';let st={};try{st=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+const root=document.getElementById('steps');let total=0;
+STEPS.forEach((s,i)=>{const d=document.createElement('div');d.className='card';d.innerHTML='<b>Étape '+(i+1)+' — '+s[0]+'</b>';
+s[1].forEach((t,j)=>{total++;const id=i+'-'+j;const l=document.createElement('label');l.innerHTML='<input type="checkbox" '+(st[id]?'checked':'')+'> '+t;
+l.firstChild.onchange=e=>{st[id]=e.target.checked;try{localStorage.setItem(key,JSON.stringify(st))}catch(_){}upd()};d.appendChild(l)});root.appendChild(d)});
+function upd(){const n=Object.values(st).filter(Boolean).length;document.getElementById('pb').firstChild.style.width=(100*n/total)+'%';document.getElementById('pt').textContent=n+' / '+total+' points validés'}
+upd();
+</script></body></html>
