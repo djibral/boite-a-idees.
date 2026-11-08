@@ -25,7 +25,7 @@ h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 8px}
 .chk small{color:var(--muted);display:block}
 .tag{font-size:11px;border-radius:99px;padding:2px 8px;border:1px solid var(--line);color:var(--muted)}
 .tag.auto{border-color:var(--ok);color:var(--ok)}.tag.manu{border-color:var(--warn);color:var(--warn)}
-.st{font-weight:600}.st.DRAFT{color:var(--warn)}.st.ARCHIVED{color:var(--muted)}.st.ACTIVE{color:var(--ok)}
+a{color:var(--accent)}.st{font-weight:600}.st.DRAFT{color:var(--warn)}.st.ARCHIVED{color:var(--muted)}.st.ACTIVE{color:var(--ok)}
 .gate{font-size:13px;color:var(--muted);margin-top:6px}
 .row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
 table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:6px;text-align:center}th:first-child,td:first-child{text-align:left}
@@ -90,6 +90,18 @@ const STEPS=[
  ["Contrôle final sur le site public (mobile + ordinateur)","manu"]]}
 ];
 
+const LINKS={
+0:[["Printful – Produits synchronisés","https://www.printful.com/dashboard/sync"],["Catalogue Printful","https://www.printful.com/custom-products"]],
+1:[["Admin Shopify – produit","@admin"]],
+2:[["Admin Shopify – produit","@admin"]],
+3:[["Éditeur Printful (zones)","https://www.printful.com/dashboard/sync"]],
+4:[["Canva – supprimer l'arrière-plan","https://www.canva.com/features/background-remover/"]],
+5:[["Éditeur Printful (width/height)","https://www.printful.com/dashboard/sync"]],
+6:[["Admin Shopify – médias","@admin"]],
+7:[["Admin Shopify – fiche","@admin"],["Guide des tailles","https://1par1.fr/pages/guide-des-tailles"]],
+8:[["Printful – commandes","https://www.printful.com/dashboard/orders"]],
+9:[["Voir sur la boutique","@shop"],["Admin Shopify – publication","@admin"]]};
+function lk(p,u){return u==="@admin"?"https://1par1.fr/admin/products/"+p.id:u==="@shop"?"https://1par1.fr/products/"+p.handle:u}
 /* ---- Données d'audit (générées depuis Shopify) ---- */
 let AUDIT=null;
 const KEY="protocole-produit-v1";
@@ -110,11 +122,12 @@ function render(){
   ov.innerHTML="<tr><th>Produit</th><th>Statut</th>"+STEPS.map((s,i)=>"<th>"+(i+1)+"</th>").join("")+"<th>%</th></tr>"+
    AUDIT.products.map(p=>"<tr><td>"+p.title+"</td><td class='st "+p.status+"'>"+p.status+"</td>"+STEPS.map((s,i)=>"<td>"+(stepDone(p,i)?"✅":"⬜")+"</td>").join("")+"<td>"+pct(p)+"%</td></tr>").join("");
   const p=AUDIT.products[cur],box=document.getElementById("prod");
-  let h="<div class='card'><div class='row'><b>"+p.title+"</b><span class='st "+p.status+"'>"+p.status+"</span></div><div class='bar'><i style='width:"+pct(p)+"%'></i></div>";
+  let h="<div class='card'><div class='row'><b><a href='"+lk(p,"@admin")+"' target='_blank' rel='noopener'>"+p.title+"</a></b><span class='st "+p.status+"'>"+p.status+"</span></div><div class='bar'><i style='width:"+pct(p)+"%'></i></div>";
   STEPS.forEach((s,si)=>{const ok=unlocked(p,si);
     h+="<div class='step"+(ok?"":" locked")+"'><h3>"+(stepDone(p,si)?"✅ ":"")+s.t+"</h3>";
     s.c.forEach((c,ci)=>{const auto=c[1]==="auto",on=isOn(p,si,ci);
       h+="<label class='chk'><input type='checkbox' "+(on?"checked ":"")+((auto||!ok)?"disabled ":"")+"data-k='"+p.id+"|"+si+"|"+ci+"'><span>"+c[0]+" <span class='tag "+(auto?"auto":"manu")+"'>"+(auto?"auto":"manuel")+"</span>"+(auto&&p.notes&&p.notes[c[2]]?"<small>"+p.notes[c[2]]+"</small>":"")+"</span></label>"});
+    h+="<div class='gate'>"+(LINKS[si]||[]).map(l=>"<a href='"+lk(p,l[1])+"' target='_blank' rel='noopener'>🔗 "+l[0]+"</a>").join(" · ")+"</div>";
     if(!ok)h+="<div class='gate'>🔒 Terminer l'étape précédente d'abord.</div>";
     h+="</div>"});
   box.innerHTML=h+"</div>";

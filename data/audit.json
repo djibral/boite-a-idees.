@@ -27,7 +27,8 @@
     "optname": "Option « Size » à renommer « Taille »",
     "media4": "2 images",
     "alt": "« Product mockup »"
-   }
+   },
+   "handle": "unisex-hoodie"
   },
   {
    "id": "12303775203592",
@@ -53,7 +54,8 @@
     "optname": "Option « Size »",
     "media4": "3 images",
     "alt": "« Product mockup »"
-   }
+   },
+   "handle": "unisex-hoodie-1"
   },
   {
    "id": "12314591199496",
@@ -78,7 +80,8 @@
    "notes": {
     "media4": "3 images seulement (il en faut 4)",
     "sizeguide": "Lien vers la page guide uniquement, pas de tableau"
-   }
+   },
+   "handle": "sweat-a-capuche-unisexe"
   },
   {
    "id": "12346956054792",
@@ -104,7 +107,8 @@
     "media4": "2 images",
     "alt": "« Product mockup »",
     "desc": "Texte Printful générique, sans histoire de marque"
-   }
+   },
+   "handle": "sweat-a-capuche-unisexe-1"
   },
   {
    "id": "12347015463176",
@@ -128,7 +132,8 @@
    },
    "notes": {
     "alt": "4 images sans alt descriptif (3× « Product mockup » + 1 vide)"
-   }
+   },
+   "handle": "sweat-a-capuche-unisexe-2"
   }
  ]
 }
