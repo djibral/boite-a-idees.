@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocole produit Printful → Shopify — 1paR'1</title>
+<style>
+:root{--bg:#0d1117;--card:#161d2b;--line:#27314a;--txt:#e7ecf6;--muted:#8f9cb8;--ok:#34c48d;--warn:#f2b544;--bad:#ff6b6b;--accent:#6c8cff}
+@media (prefers-color-scheme: light){:root{--bg:#eef1f8;--card:#fff;--line:#dfe4f0;--txt:#131a26;--muted:#5d6880}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;max-width:1100px;margin-inline:auto}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:17px;margin:28px 0 8px}
+.sub{color:var(--muted);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin:12px 0}
+.bar{height:8px;background:var(--line);border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok);width:0}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button,.btn{background:var(--card);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px 12px;cursor:pointer}
+.tabs button.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,var(--card))}
+.step{border-top:1px solid var(--line);padding:10px 0}
+.step:first-child{border-top:0}
+.step h3{margin:0;font-size:15px}
+.step.locked{opacity:.45}
+.chk{display:flex;gap:8px;align-items:flex-start;margin:6px 0}
+.chk input{margin-top:4px;width:18px;height:18px;flex:0 0 auto}
+.chk small{color:var(--muted);display:block}
+.tag{font-size:11px;border-radius:99px;padding:2px 8px;border:1px solid var(--line);color:var(--muted)}
+.tag.auto{border-color:var(--ok);color:var(--ok)}.tag.manu{border-color:var(--warn);color:var(--warn)}
+.st{font-weight:600}.st.DRAFT{color:var(--warn)}.st.ARCHIVED{color:var(--muted)}.st.ACTIVE{color:var(--ok)}
+.gate{font-size:13px;color:var(--muted);margin-top:6px}
+.row{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+table{width:100%;border-collapse:collapse;font-size:13px}th,td{border-bottom:1px solid var(--line);padding:6px;text-align:center}th:first-child,td:first-child{text-align:left}
+</style>
+</head>
+<body>
+<h1>Protocole produit — Printful → Shopify</h1>
+<p class="sub">Chaque étape doit être cochée <b>en entier</b> avant de passer à la suivante. Le statut « Vitrine » n'est possible qu'une fois les étapes 1 à 9 validées. Dernier audit Shopify : <b id="audit"></b>.</p>
+
+<div class="card">
+  <div class="row"><b>Vue d'ensemble équipe</b><span><button class="btn" id="exp">Exporter JSON</button> <button class="btn" id="rst">Réinitialiser mes cases</button></span></div>
+  <table id="ov"></table>
+  <p class="gate">Légende : <span class="tag auto">auto</span> = vérifié automatiquement dans Shopify (mis à jour par la tâche planifiée) · <span class="tag manu">manuel</span> = à confirmer dans Printful/Canva, jamais coché automatiquement. Vos cases sont enregistrées dans ce navigateur ; exportez le JSON pour partager et recommittez <code>data/audit.json</code>.</p>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div id="prod"></div>
+
+<script>
+/* ---- Protocole : ordre strict ---- */
+const STEPS=[
+{t:"1. Choix du produit Printful",c:[
+ ["Modèle de base choisi (ex. Unisex Premium Hoodie) et fournisseur/pays de production notés","manu"],
+ ["Couleur(s) de base choisie(s)","manu"],
+ ["Technique : broderie ou impression (DTG) — notée dans les tags (broderie / dtg)","auto","tech"]]},
+{t:"2. Tailles & variantes",c:[
+ ["Toutes les tailles voulues activées (S → 3XL)","auto","sizes"],
+ ["Option nommée « Taille » (pas « Size »)","auto","optname"],
+ ["Une variante par couleur/taille, SKU présent sur chaque variante","auto","sku"]]},
+{t:"3. Prix & marge",c:[
+ ["Prix de vente identique et cohérent sur toutes les variantes","auto","price"],
+ ["Coût Printful renseigné (coût par article Shopify)","auto","cost"],
+ ["Marge ≥ objectif vérifiée (suivre le surcoût 2XL/3XL)","manu"]]},
+{t:"4. Zones d'impression / broderie",c:[
+ ["Poitrine (gauche/droite) : choix + technique confirmés","manu"],
+ ["Dos : choix + technique confirmés","manu"],
+ ["Manche droite / gauche : utilisée ou explicitement « non »","manu"],
+ ["Poignet droit / gauche : utilisé ou explicitement « non »","manu"]]},
+{t:"5. Fichiers & fond",c:[
+ ["Fond du logo supprimé si besoin (PNG transparent) — Canva « Supprimer l'arrière-plan »","manu"],
+ ["Résolution suffisante (≥150 dpi à la taille d'impression) ; palette de fils limitée pour la broderie","manu"]]},
+{t:"6. Taille & position du logo (éditeur Printful)",c:[
+ ["Width / Height relevés et notés dans la fiche (en pouces) pour chaque zone","manu"],
+ ["Position (haut/gauche) identique d'une couleur à l'autre","manu"],
+ ["Aperçu de chaque zone contrôlé dans l'éditeur","manu"]]},
+{t:"7. Mockups & médias Shopify",c:[
+ ["Au moins 4 images (face, dos, côté/manche, détail)","auto","media4"],
+ ["Aucun texte alternatif générique « Product mockup » ou vide","auto","alt"],
+ ["Image principale = face, bonne couleur","manu"]]},
+{t:"8. Fiche Shopify",c:[
+ ["Titre FR cohérent (« Sweat à Capuche Unisexe — Couleur »)","auto","title"],
+ ["Description complète (histoire, matière, taille, fabrication, entretien, livraison/retours, RSGP)","auto","desc"],
+ ["Guide des tailles présent","auto","sizeguide"],
+ ["Description SEO renseignée","auto","seo"],
+ ["Type de produit, vendeur, tags, collections assignés","auto","coll"]]},
+{t:"9. Commande test & validation",c:[
+ ["Commande d'échantillon passée et reçue (qualité broderie/impression, taille, couleur)","manu"],
+ ["Validation écrite d'un 2e membre de l'équipe","manu"]]},
+{t:"10. Publication / vitrine",c:[
+ ["Statut ACTIF et publié sur la boutique en ligne","auto","published"],
+ ["Visible dans « La collection » et « Page d'accueil »","auto","coll"],
+ ["Contrôle final sur le site public (mobile + ordinateur)","manu"]]}
+];
+
+/* ---- Données d'audit (générées depuis Shopify) ---- */
+let AUDIT=null;
+const KEY="protocole-produit-v1";
+let manual={};try{manual=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+let cur=0;
+
+function autoVal(p,k){const a=p.checks;return !!a[k]}
+function stepDone(p,si){return STEPS[si].c.every((c,ci)=>isOn(p,si,ci))}
+function isOn(p,si,ci){const c=STEPS[si].c[ci];return c[1]==="auto"?autoVal(p,c[2]):!!manual[p.id+"|"+si+"|"+ci]}
+function unlocked(p,si){for(let i=0;i<si;i++)if(!stepDone(p,i))return false;return true}
+function pct(p){let n=0,t=0;STEPS.forEach((s,si)=>s.c.forEach((c,ci)=>{t++;if(isOn(p,si,ci))n++}));return Math.round(100*n/t)}
+
+function render(){
+  document.getElementById("audit").textContent=AUDIT.date;
+  const T=document.getElementById("tabs");T.innerHTML="";
+  AUDIT.products.forEach((p,i)=>{const b=document.createElement("button");b.className=i===cur?"on":"";b.textContent=p.title.slice(0,34)+" · "+pct(p)+"%";b.onclick=()=>{cur=i;render()};T.appendChild(b)});
+  const ov=document.getElementById("ov");
+  ov.innerHTML="<tr><th>Produit</th><th>Statut</th>"+STEPS.map((s,i)=>"<th>"+(i+1)+"</th>").join("")+"<th>%</th></tr>"+
+   AUDIT.products.map(p=>"<tr><td>"+p.title+"</td><td class='st "+p.status+"'>"+p.status+"</td>"+STEPS.map((s,i)=>"<td>"+(stepDone(p,i)?"✅":"⬜")+"</td>").join("")+"<td>"+pct(p)+"%</td></tr>").join("");
+  const p=AUDIT.products[cur],box=document.getElementById("prod");
+  let h="<div class='card'><div class='row'><b>"+p.title+"</b><span class='st "+p.status+"'>"+p.status+"</span></div><div class='bar'><i style='width:"+pct(p)+"%'></i></div>";
+  STEPS.forEach((s,si)=>{const ok=unlocked(p,si);
+    h+="<div class='step"+(ok?"":" locked")+"'><h3>"+(stepDone(p,si)?"✅ ":"")+s.t+"</h3>";
+    s.c.forEach((c,ci)=>{const auto=c[1]==="auto",on=isOn(p,si,ci);
+      h+="<label class='chk'><input type='checkbox' "+(on?"checked ":"")+((auto||!ok)?"disabled ":"")+"data-k='"+p.id+"|"+si+"|"+ci+"'><span>"+c[0]+" <span class='tag "+(auto?"auto":"manu")+"'>"+(auto?"auto":"manuel")+"</span>"+(auto&&p.notes&&p.notes[c[2]]?"<small>"+p.notes[c[2]]+"</small>":"")+"</span></label>"});
+    if(!ok)h+="<div class='gate'>🔒 Terminer l'étape précédente d'abord.</div>";
+    h+="</div>"});
+  box.innerHTML=h+"</div>";
+  box.querySelectorAll("input[data-k]").forEach(i=>i.onchange=()=>{manual[i.dataset.k]=i.checked;try{localStorage.setItem(KEY,JSON.stringify(manual))}catch(e){}render()});
+}
+document.getElementById("exp").onclick=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(manual,null,2)],{type:"application/json"}));a.download="protocole-cases.json";a.click()};
+document.getElementById("rst").onclick=()=>{if(confirm("Effacer vos cases manuelles ?")){manual={};try{localStorage.removeItem(KEY)}catch(e){}render()}};
+fetch("data/audit.json").then(r=>r.json()).then(d=>{AUDIT=d;render()}).catch(()=>{document.body.insertAdjacentHTML("beforeend","<p>Impossible de charger data/audit.json (ouvrez la page via un serveur, ex. <code>python3 -m http.server</code>).</p>")});
+</script>
+</body>
+</html>
