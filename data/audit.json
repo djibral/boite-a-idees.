@@ -1,0 +1,134 @@
+{
+ "date": "2026-11-08",
+ "shop": "1par1.fr",
+ "note": "0 produit publié sur la boutique en ligne",
+ "products": [
+  {
+   "id": "12303774875912",
+   "title": "Unisex Hoodie Blanc",
+   "status": "ARCHIVED",
+   "checks": {
+    "tech": false,
+    "sizes": true,
+    "optname": false,
+    "sku": true,
+    "price": true,
+    "cost": true,
+    "media4": false,
+    "alt": false,
+    "desc": true,
+    "sizeguide": false,
+    "seo": false,
+    "coll": false,
+    "published": false,
+    "title": false
+   },
+   "notes": {
+    "optname": "Option « Size » à renommer « Taille »",
+    "media4": "2 images",
+    "alt": "« Product mockup »"
+   }
+  },
+  {
+   "id": "12303775203592",
+   "title": "Unisex Hoodie",
+   "status": "ARCHIVED",
+   "checks": {
+    "tech": true,
+    "sizes": true,
+    "optname": false,
+    "sku": true,
+    "price": true,
+    "cost": true,
+    "media4": false,
+    "alt": false,
+    "desc": true,
+    "sizeguide": false,
+    "seo": false,
+    "coll": false,
+    "published": false,
+    "title": false
+   },
+   "notes": {
+    "optname": "Option « Size »",
+    "media4": "3 images",
+    "alt": "« Product mockup »"
+   }
+  },
+  {
+   "id": "12314591199496",
+   "title": "Sweat à Capuche Unisexe — Noir",
+   "status": "DRAFT",
+   "checks": {
+    "tech": true,
+    "sizes": true,
+    "optname": true,
+    "sku": true,
+    "price": true,
+    "cost": true,
+    "media4": false,
+    "alt": true,
+    "desc": true,
+    "sizeguide": false,
+    "seo": true,
+    "coll": true,
+    "published": false,
+    "title": true
+   },
+   "notes": {
+    "media4": "3 images seulement (il en faut 4)",
+    "sizeguide": "Lien vers la page guide uniquement, pas de tableau"
+   }
+  },
+  {
+   "id": "12346956054792",
+   "title": "Sweat à Capuche blanc Unisexe",
+   "status": "ARCHIVED",
+   "checks": {
+    "tech": false,
+    "sizes": true,
+    "optname": true,
+    "sku": true,
+    "price": true,
+    "cost": true,
+    "media4": false,
+    "alt": false,
+    "desc": true,
+    "sizeguide": false,
+    "seo": false,
+    "coll": false,
+    "published": false,
+    "title": false
+   },
+   "notes": {
+    "media4": "2 images",
+    "alt": "« Product mockup »",
+    "desc": "Texte Printful générique, sans histoire de marque"
+   }
+  },
+  {
+   "id": "12347015463176",
+   "title": "Sweat à Capuche Unisexe — Blanc",
+   "status": "DRAFT",
+   "checks": {
+    "tech": true,
+    "sizes": true,
+    "optname": true,
+    "sku": true,
+    "price": true,
+    "cost": true,
+    "media4": true,
+    "alt": false,
+    "desc": true,
+    "sizeguide": true,
+    "seo": true,
+    "coll": true,
+    "published": false,
+    "title": true
+   },
+   "notes": {
+    "alt": "4 images sans alt descriptif (3× « Product mockup » + 1 vide)"
+   }
+  }
+ ]
+}
