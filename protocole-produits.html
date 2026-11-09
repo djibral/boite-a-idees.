@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Protocole Produit Printful → Shopify</title>
+<style>
+:root{--bg:#0d1117;--card:#161d2b;--line:#27314a;--txt:#e7ecf6;--muted:#8f9cb8;--ok:#34c48d;--warn:#f2b544;--bad:#ff6b6b;--acc:#6c8cff}
+@media (prefers-color-scheme:light){:root{--bg:#eef1f8;--card:#fff;--line:#dfe4f0;--txt:#131a26;--muted:#5d6880}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;padding:16px;max-width:980px;margin:auto}
+h1{font-size:1.5rem;margin:.2em 0}h2{font-size:1.15rem;margin:1.6em 0 .5em}h3{margin:0 0 .4em;font-size:1rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:12px 0}
+.muted{color:var(--muted);font-size:.9rem}
+label{display:flex;gap:10px;align-items:flex-start;padding:4px 0;cursor:pointer}
+input[type=checkbox]{margin-top:4px;width:18px;height:18px;flex:none}
+.gate{border-left:4px solid var(--acc)}
+.bar{height:8px;background:var(--line);border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ok);width:0}
+table{width:100%;border-collapse:collapse;font-size:.85rem;display:block;overflow-x:auto}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:center;white-space:nowrap}th:first-child,td:first-child{text-align:left}
+.y{color:var(--ok)}.n{color:var(--bad)}.p{color:var(--warn)}
+.tag{display:inline-block;padding:1px 8px;border-radius:99px;border:1px solid var(--line);font-size:.78rem;margin-right:4px}
+</style>
+</head>
+<body>
+<h1>Protocole de création produit — Printful → Shopify</h1>
+<p class="muted">Boutique 1paR'1 (1par1.fr) · Dernière mise à jour : 9 novembre 2026 · Règle : une étape non validée = on ne passe pas à la suivante. Les cases cochées sont mémorisées dans ce navigateur ; pour partager l'état à l'équipe, reportez-les dans le tableau d'audit ci-dessous (versionné dans Git).</p>
+<div class="card"><div id="pct" class="muted">Progression du produit en cours : 0 %</div><div class="bar"><i id="fill"></i></div></div>
+
+<h2>A. Étapes de création (une seule fiche produit à la fois)</h2>
+
+<div class="card gate"><h3>Étape 1 — Choix du produit (Printful)</h3>
+<label><input type="checkbox"> Modèle catalogue choisi (ex. Unisex Premium Pullover Hoodie), fournisseur/pays de fabrication noté</label>
+<label><input type="checkbox"> Couleur(s) choisie(s) — 1 fiche Shopify par couleur ou option « Couleur » décidée</label>
+<label><input type="checkbox"> Tailles activées S → 3XL (aucune manquante, SKU Printful présents)</label>
+<label><input type="checkbox"> Taille « petit/normal » vérifiée et reportée dans la description + guide des tailles</label></div>
+
+<div class="card gate"><h3>Étape 2 — Prix</h3>
+<label><input type="checkbox"> Coût Printful (produit + impression/broderie + livraison) relevé</label>
+<label><input type="checkbox"> Prix de vente TTC fixé (grille actuelle : 69,90 €) avec marge ≥ objectif</label>
+<label><input type="checkbox"> Même prix sur toutes les variantes, ou écart justifié (3XL…)</label>
+<label><input type="checkbox"> Seuil de livraison offerte cohérent avec les autres fiches (actuel : 100 €)</label></div>
+
+<div class="card gate"><h3>Étape 3 — Technique & emplacements du design</h3>
+<label><input type="checkbox"> Technique par zone : broderie ou impression (DTG) — une zone = une technique</label>
+<label><input type="checkbox"> Poitrine (gauche/droite) : fichier + technique</label>
+<label><input type="checkbox"> Dos : fichier + technique</label>
+<label><input type="checkbox"> Manche gauche / manche droite : renseigné ou « aucun »</label>
+<label><input type="checkbox"> Poignet gauche / poignet droit : renseigné ou « aucun »</label>
+<label><input type="checkbox"> Nombre de fils/couleurs de broderie dans les limites Printful</label></div>
+
+<div class="card gate"><h3>Étape 4 — Préparation du logo</h3>
+<label><input type="checkbox"> Arrière-plan supprimé si besoin (PNG transparent, bords propres — outil : Canva « remove-background »)</label>
+<label><input type="checkbox"> Résolution suffisante (≥ 150 dpi à la taille d'impression), fond transparent vérifié sur fond sombre ET clair</label>
+<label><input type="checkbox"> Taille du logo réglée dans l'éditeur Printful : width / height notés (proportions verrouillées)</label>
+<label><input type="checkbox"> Position (haut/centrage, décalage) notée ; mockup contrôlé visuellement</label></div>
+
+<div class="card gate"><h3>Étape 5 — Variantes & mockups</h3>
+<label><input type="checkbox"> Toutes les variantes taille/couleur synchronisées (Printful ↔ Shopify), SKU uniques</label>
+<label><input type="checkbox"> Mockups : face, dos, détail, manche/poignet si utilisé — textes alternatifs (alt) renseignés (aucun « Product mockup »)</label>
+<label><input type="checkbox"> Image principale = face, ordre des images validé</label></div>
+
+<div class="card gate"><h3>Étape 6 — Fiche Shopify (brouillon)</h3>
+<label><input type="checkbox"> Titre clair, handle propre, type de produit, vendeur « 1paR'1 », tags (broderie / dtg / catalogue)</label>
+<label><input type="checkbox"> Description FR : histoire, caractéristiques exactes (broderie ≠ impression), taille, fabrication, entretien, livraison/retours</label>
+<label><input type="checkbox"> Mentions RSGP/conformité + contact (contact@1par1.fr) homogènes</label>
+<label><input type="checkbox"> SEO : balise titre ET méta-description renseignées</label>
+<label><input type="checkbox"> Collection associée ; statut = Brouillon</label></div>
+
+<div class="card gate"><h3>Étape 7 — Commande test & contrôle qualité</h3>
+<label><input type="checkbox"> Échantillon/commande test passée (ou mockup validé par 2 personnes)</label>
+<label><input type="checkbox"> Rendu réel conforme (emplacement, taille, couleurs, finition)</label></div>
+
+<div class="card gate"><h3>Étape 8 — Validation puis publication</h3>
+<label><input type="checkbox"> Validation par un 2ᵉ membre de l'équipe (nom + date notés dans le tableau)</label>
+<label><input type="checkbox"> Publié sur le canal « Boutique en ligne » (et autres canaux voulus) ; statut = Actif</label>
+<label><input type="checkbox"> Page produit vue côté client (mobile + ordinateur), ajout au panier et paiement testés</label>
+<label><input type="checkbox"> Produit exposé en vitrine / collection d'accueil</label></div>
+
+<h2>B. Audit des produits Shopify existants (9 nov. 2026)</h2>
+<p class="muted">Source : lecture de la boutique via Shopify. ✔ conforme · ✖ manquant · ◐ partiel. Étapes 3, 4, 7 : non vérifiables automatiquement (à confirmer dans Printful).</p>
+<div class="card"><table>
+<tr><th>Produit</th><th>Statut</th><th>É1 Produit</th><th>É2 Prix</th><th>É3 Zones</th><th>É5 Variantes</th><th>É5 Alt images</th><th>É6 Description</th><th>É6 SEO titre</th><th>É6 SEO desc.</th><th>É8 Publié</th></tr>
+<tr><td>Sweat Capuche Noir (broderie poitrine + dos doré)</td><td>Brouillon</td><td class="y">✔</td><td class="y">✔ 69,90</td><td class="p">◐ poitrine+dos, manches/poignets non précisés</td><td class="y">✔ 6/6</td><td class="y">✔ 3/3</td><td class="y">✔</td><td class="n">✖</td><td class="y">✔</td><td class="n">✖ (0 canal)</td></tr>
+<tr><td>Sweat Capuche Blanc (impression)</td><td>Brouillon</td><td class="y">✔</td><td class="y">✔ 69,90</td><td class="p">◐ face/dos/manche en images, zones non documentées</td><td class="y">✔ 6/6</td><td class="p">◐ 3 sur 7 sans alt utile</td><td class="y">✔ (+ guide tailles)</td><td class="n">✖</td><td class="y">✔</td><td class="n">✖ (0 canal)</td></tr>
+<tr><td>Unisex Hoodie Blanc</td><td>Archivé</td><td class="p">◐</td><td class="y">✔</td><td class="n">?</td><td class="y">✔</td><td class="n">✖ « Product mockup »</td><td class="p">◐ ancien texte (seuil 65 €, « taille petit »)</td><td class="n">✖</td><td class="n">✖</td><td class="n">—</td></tr>
+<tr><td>Unisex Hoodie</td><td>Archivé</td><td class="p">◐</td><td class="y">✔</td><td class="n">?</td><td class="y">✔</td><td class="n">✖</td><td class="p">◐ ancien texte</td><td class="n">✖</td><td class="n">✖</td><td class="n">—</td></tr>
+<tr><td>Sweat Capuche blanc Unisexe (ancien)</td><td>Archivé</td><td class="p">◐</td><td class="y">✔</td><td class="n">?</td><td class="y">✔</td><td class="n">✖</td><td class="n">✖ texte Printful brut</td><td class="n">✖</td><td class="n">✖</td><td class="n">—</td></tr>
+</table></div>
+
+<h3>Constats & actions prioritaires</h3>
+<div class="card">
+<ol>
+<li><b>Aucun produit n'est actif ni publié</b> : 2 brouillons, 3 archivés, 0 canal de vente → la vitrine est vide. Les 2 brouillons sont les plus avancés.</li>
+<li>Ajouter la <b>balise titre SEO</b> aux 2 brouillons (méta-description déjà faite).</li>
+<li>Blanc : corriger les <b>textes alternatifs</b> manquants/« Product mockup » sur 4 images.</li>
+<li>Documenter dans chaque fiche (ou dans ce tableau) les zones exactes : poitrine, dos, manches, poignets, tailles du logo (width × height).</li>
+<li>Faire la commande test (étape 7) puis la validation à 2 (étape 8) avant de passer en Actif.</li>
+<li>Les 3 archivés ont des textes obsolètes (seuil 65 € vs 100 €, e-mail personnel) : ne pas les réactiver sans les mettre à niveau ; sinon les supprimer.</li>
+<li>Incohérence détectée : le Noir est « taille normalement » mais d'anciens textes disent « taille petit » → vérifier le guide des tailles.</li>
+</ol></div>
+
+<h2>C. Connecteurs recommandés pour automatiser</h2>
+<div class="card">
+<p class="muted">Déjà disponibles et connectés dans cet environnement :</p>
+<p><span class="tag">Shopify</span> lecture/mise à jour des produits, statut, SEO, médias, collections — base de l'audit hebdomadaire.<br>
+<span class="tag">Canva</span> suppression d'arrière-plan, redimensionnement et export PNG du logo (étape 4).<br>
+<span class="tag">Zapier</span> relie Printful ↔ Shopify ↔ Sheets/Notion/Slack (ex. : nouveau produit Printful → ligne dans la checklist + alerte e-mail).<br>
+<span class="tag">Notion</span> ou <span class="tag">monday.com</span> : une base « Produits » avec une propriété case à cocher par étape, vue Kanban Brouillon → Validé → Publié, visible par toute l'équipe.<br>
+<span class="tag">Google Sheets</span> : alternative simple, 1 ligne par produit, 1 colonne par étape (même grille que le tableau B).<br>
+<span class="tag">Gmail / Google Calendar</span> : rappel de l'audit hebdomadaire et relances de validation.</p>
+<p class="muted">Non connectés pour l'instant : <b>Printful</b> (aucun connecteur direct ; passer par Zapier ou l'intégration native Printful dans Shopify), Slack (échec de connexion proxy lors de ce passage — à reconnecter pour les alertes d'équipe).</p>
+<p><b>Combinaison conseillée :</b> Shopify (source de vérité) + Notion (checklist partagée) + Zapier (synchronisation et alertes) + Canva (visuels). L'audit B est relancé automatiquement par la routine planifiée.</p>
+</div>
+
+<script>
+(function(){
+  var boxes=[].slice.call(document.querySelectorAll('input[type=checkbox]'));
+  var key='protocole-produit-v1';
+  var s={};try{s=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+  boxes.forEach(function(b,i){b.checked=!!s[i];b.addEventListener('change',function(){s[i]=b.checked;try{localStorage.setItem(key,JSON.stringify(s))}catch(e){}upd()})});
+  function upd(){var n=boxes.filter(function(b){return b.checked}).length,p=Math.round(100*n/boxes.length);
+    document.getElementById('pct').textContent='Progression du produit en cours : '+p+' % ('+n+'/'+boxes.length+')';
+    document.getElementById('fill').style.width=p+'%'}
+  upd();
+})();
+</script>
+</body>
+</html>
