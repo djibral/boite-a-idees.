@@ -1,0 +1,20 @@
+# Cœur du pipeline
+openai>=1.40
+requests>=2.31
+moviepy>=2.1,<3
+pillow>=10.1
+numpy
+openai-whisper
+python-dotenv
+schedule
+
+# Voix Google (optionnel, si voix.provider = "google")
+google-cloud-texttospeech
+
+# Publication YouTube
+google-api-python-client
+google-auth-oauthlib
+
+# Publication TikTok / Instagram (optionnel, bibliothèques non officielles)
+# tiktok-uploader
+# instagrapi

@@ -1,0 +1,37 @@
+{
+  "dossier_sortie": "output",
+  "llm": { "model": "gpt-4o-mini", "temperature": 0.8, "langue": "français" },
+  "voix": {
+    "provider": "elevenlabs",
+    "voice_id": "21m00Tcm4TlvDq8ikWAM",
+    "model_id": "eleven_multilingual_v2",
+    "vitesse": 1.1,
+    "google_voice": "fr-FR-Neural2-A"
+  },
+  "visuels": { "source": "pexels", "nombre_clips": 4, "image_model": "dall-e-3" },
+  "video": { "largeur": 1080, "hauteur": 1920, "fps": 30, "bitrate": "8000k", "preset": "medium" },
+  "sous_titres": {
+    "mode": "highlight",
+    "whisper_model": "small",
+    "langue": "fr",
+    "mots_par_groupe": 3,
+    "police": null,
+    "taille": 80,
+    "couleur": "white",
+    "couleur_highlight": "yellow",
+    "contour": "black",
+    "epaisseur_contour": 6,
+    "marge_bas": 450
+  },
+  "musique": { "fichier": "assets/musique_ambient.mp3", "volume": 0.1 },
+  "publication": {
+    "youtube": { "enabled": false, "privacy": "private", "category_id": "22", "contenu_synthetique": true },
+    "tiktok": { "enabled": false, "cookies": "tiktok_cookies.txt" },
+    "instagram": { "enabled": false }
+  },
+  "planification": {
+    "heures": ["10:00", "18:00"],
+    "style": "motivant et percutant",
+    "niches": ["productivité", "finance personnelle", "psychologie", "motivation", "santé", "technologie"]
+  }
+}
