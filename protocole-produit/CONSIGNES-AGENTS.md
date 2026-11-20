@@ -30,5 +30,11 @@ Tout agent (tâche programmée ou session) qui touche aux produits de la boutiqu
 - Après succès : `status: "appliquee"`, `appliedAt`. En cas d'échec : laisser `approuvee` et le signaler.
 - Jamais : changer un prix, publier / archiver / supprimer un produit, ou toucher à Printful sans une proposition approuvée qui le dit explicitement.
 
+## 6. Liens cliquables (obligatoire)
+Dans chaque réponse, notification ou compte rendu, écrire les liens sous forme cliquable `[texte](https://…)`, jamais en texte brut ni en simple nom de fichier :
+- la page de suivi : [Protocole Produit 1.paR'1](https://claude.ai/artifact/Esko6o9uvELSpAVckJbX2e)
+- chaque produit cité : sa page boutique (`https://1par1.fr/products/<handle>`) et sa fiche admin (`https://1par1.fr/admin/products/<id>`)
+- chaque fichier du dépôt cité : son lien GitHub (`https://github.com/djibral/boite-a-idees./blob/<branche>/<chemin>`)
+
 ## Phrase à ajouter au prompt de chaque tâche programmée
 > Avant toute action sur les produits, lis et applique `protocole-produit/CONSIGNES-AGENTS.md` du dépôt boite-a-idees. (vérifier → proposer → attendre l'accord → appliquer).
