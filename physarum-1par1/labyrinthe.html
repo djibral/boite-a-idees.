@@ -1,0 +1,453 @@
+<title>Le Blob et le labyrinthe</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: boîte de Petri (canvas) à gauche, carnet de laboratoire à droite ; bande "du labyrinthe à 1par1.fr" dessous. */
+:root{
+  --bg:#F3EEE2;          /* crème 1par1 */
+  --paper:#FBF8F1;
+  --ink:#1B1A16;
+  --muted:#6B6555;
+  --line:#D9D0BC;
+  --agar:#E9DFC6;
+  --wall:#3A3427;
+  --slime:#E3AE12;
+  --slime-hi:#F7D24A;
+  --gold:#B08A34;
+  --navy:#1E2B4A;
+  --oat:#D8C49A;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#15140F; --paper:#1D1B15; --ink:#EEE8D8; --muted:#A39B86; --line:#3A362A;
+  --agar:#232017; --wall:#8C8268; --slime:#F0BC1E; --slime-hi:#FFE27A; --gold:#D4B05A; --navy:#9FB2DC; --oat:#B9A57A;
+  color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#15140F; --paper:#1D1B15; --ink:#EEE8D8; --muted:#A39B86; --line:#3A362A;
+  --agar:#232017; --wall:#8C8268; --slime:#F0BC1E; --slime-hi:#FFE27A; --gold:#D4B05A; --navy:#9FB2DC; --oat:#B9A57A;
+  color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:28px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+header{display:flex;flex-direction:column;gap:6px;max-width:70ch}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.4vw,46px);line-height:1.05;margin:0;text-wrap:balance}
+h1 em{font-style:normal;color:var(--slime);-webkit-text-stroke:0}
+header p{margin:0;color:var(--muted)}
+.lab{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+@media (max-width:860px){.lab{grid-template-columns:1fr}}
+.dish{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+.dish-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.phase{font-family:var(--display);font-weight:700;font-size:20px}
+.hint{font-size:13px;color:var(--muted)}
+canvas{display:block;width:100%;border-radius:10px;cursor:crosshair;touch-action:manipulation}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+button{font:500 14px var(--body);color:var(--ink);background:transparent;border:1px solid var(--ink);border-radius:999px;padding:8px 16px;cursor:pointer}
+button.primary{background:var(--ink);color:var(--bg)}
+button:hover{border-color:var(--gold)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+label.inline{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+input[type=range]{accent-color:var(--slime);width:110px}
+input[type=checkbox]{accent-color:var(--slime)}
+aside{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px}
+.card h2{font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+ol.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+ol.steps li{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;opacity:.45;transition:opacity .4s}
+ol.steps li.on{opacity:1}
+ol.steps li.done{opacity:.8}
+.dot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--ink);display:grid;place-items:center;font:500 12px var(--mono)}
+li.on .dot{background:var(--slime);border-color:var(--slime);color:#1B1A16}
+li.done .dot{background:var(--ink);color:var(--bg)}
+.steps b{display:block;font-weight:600;font-size:14px}
+.steps span{font-size:13px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.stat .v{font:500 24px var(--mono);font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--muted)}
+.spark{margin-top:12px}
+.spark svg{width:100%;height:56px;display:block}
+.spark .cap{font-size:12px;color:var(--muted);display:flex;justify-content:space-between}
+.result{margin-top:12px;font-size:13px;padding:10px 12px;border-radius:10px;background:var(--agar)}
+.bridge h2{font-family:var(--display);font-size:24px;margin:0 0 4px}
+.bridge > p{margin:0 0 16px;color:var(--muted);max-width:70ch}
+.map{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+@media (max-width:980px){.map{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.map{grid-template-columns:1fr}}
+.map div{border-top:2px solid var(--slime);padding-top:10px;min-width:0}
+.map .bio{font:500 12px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.map h3{font-family:var(--display);font-size:17px;margin:2px 0 4px}
+.map p{margin:0;font-size:13.5px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:18px;height:6px;border-radius:3px;vertical-align:middle;margin-right:6px}
+@media (prefers-reduced-motion: reduce){ ol.steps li{transition:none} }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Physarum polycephalum · expérience de Nakagaki (2000)</div>
+    <h1>Le blob et le <em>labyrinthe</em></h1>
+    <p>Une seule cellule, aucun cerveau. Elle envahit toutes les galeries, sent deux sources de nourriture, épaissit les tubes où le cytoplasme circule et abandonne les impasses. Le chemin le plus court émerge de ces règles locales.</p>
+  </header>
+
+  <section class="lab">
+    <div class="dish">
+      <div class="dish-top">
+        <div class="phase" id="phaseLabel">Exploration</div>
+        <div class="hint">Cliquez une case pour déplacer la nourriture B</div>
+      </div>
+      <canvas id="cv" aria-label="Simulation du Physarum dans un labyrinthe"></canvas>
+      <div class="legend">
+        <span><i style="background:var(--slime)"></i>plasmode (épaisseur = conductivité du tube)</span>
+        <span><i style="background:var(--navy)"></i>plus court chemin calculé (comparaison)</span>
+      </div>
+      <div class="controls">
+        <button class="primary" id="btnNew">Nouveau labyrinthe</button>
+        <button id="btnReplay">Rejouer</button>
+        <button id="btnPause">Pause</button>
+        <label class="inline" for="speed">Vitesse <input type="range" id="speed" min="0.25" max="4" step="0.25" value="1"></label>
+        <label class="inline" for="showOpt"><input type="checkbox" id="showOpt"> Montrer le plus court chemin</label>
+      </div>
+    </div>
+
+    <aside>
+      <div class="card">
+        <h2>Protocole</h2>
+        <ol class="steps" id="steps">
+          <li data-p="explore"><div class="dot">1</div><div><b>Explorer</b><span>Le front en éventail avance dans toutes les galeries à la fois.</span></div></li>
+          <li data-p="food"><div class="dot">2</div><div><b>Détecter</b><span>Flocons d'avoine en A et B : le flux de cytoplasme s'organise entre eux.</span></div></li>
+          <li data-p="adapt"><div class="dot">3</div><div><b>Renforcer et élaguer</b><span>Un tube traversé par du flux s'épaissit, un tube sans flux se rétracte, en partant des bouts.</span></div></li>
+          <li data-p="done"><div class="dot">4</div><div><b>Mémoriser</b><span>Il reste un seul tube : le chemin efficace, gardé comme une trace.</span></div></li>
+        </ol>
+      </div>
+      <div class="card">
+        <h2>Carnet de mesure</h2>
+        <div class="stats">
+          <div class="stat"><div class="v" id="sTubes">0</div><div class="k">segments de tube actifs</div></div>
+          <div class="stat"><div class="v" id="sCover">0 %</div><div class="k">galeries couvertes</div></div>
+          <div class="stat"><div class="v" id="sTime">0</div><div class="k">pas de simulation</div></div>
+          <div class="stat"><div class="v" id="sOpt">0</div><div class="k">cases du plus court chemin</div></div>
+        </div>
+        <div class="spark">
+          <svg id="spark" viewBox="0 0 280 56" preserveAspectRatio="none" aria-label="Évolution du nombre de tubes actifs"></svg>
+          <div class="cap"><span>taille du réseau dans le temps</span><span id="sparkMax"></span></div>
+        </div>
+        <div class="result" id="result">Le blob part de A et colonise le labyrinthe.</div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="bridge">
+    <h2>Du labyrinthe à 1par1.fr</h2>
+    <p>A, c'est l'audience d'aujourd'hui. B, c'est l'objectif de 300 000 €. Le système à construire suit les mêmes règles que le blob, avec des données de ventes et d'engagement à la place du cytoplasme.</p>
+    <div class="map">
+      <div><div class="bio">Explorer</div><h3>Tester large</h3><p>Shorts de la Famille 1 paR 1, angles produits, TikTok, Instagram, Pinterest, YouTube : beaucoup de petites variantes à faible coût.</p></div>
+      <div><div class="bio">Détecter</div><h3>Sentir la nourriture</h3><p>Ventes, ajouts au panier, partages, enregistrements, clics vers la boutique. Les likes seuls ne nourrissent pas.</p></div>
+      <div><div class="bio">Renforcer</div><h3>Épaissir ce qui circule</h3><p>Plus de fréquence, de budget et de déclinaisons sur les formats, produits et canaux qui transportent des ventes.</p></div>
+      <div><div class="bio">Élaguer</div><h3>Rétracter les impasses</h3><p>Couper ce qui ne convertit pas après un seuil fixé à l'avance, en commençant par les bouts du réseau.</p></div>
+      <div><div class="bio">Mémoriser</div><h3>Laisser une trace</h3><p>Un journal des tests et des tendances absorbées, pour ne pas repayer deux fois la même leçon.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const $ = id => document.getElementById(id);
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let C, R, N, adj, edges, nodeEdges, A, B, arrive, maxArrive, distA, optPath;
+let phase, T, step, paused = false, speed = 1, foodTimer = 0, history = [], p = null, clock = 0;
+let cell = 20, pad = 10, col = {}, acc = 0;
+
+function readColors(){
+  const s = getComputedStyle(document.documentElement);
+  ['agar','wall','slime','slime-hi','navy','oat','ink','paper','muted'].forEach(k => col[k] = s.getPropertyValue('--'+k).trim());
+}
+
+function rand(a,b){ return a + Math.random()*(b-a); }
+
+function buildMaze(){
+  const narrow = cv.parentElement.clientWidth < 560;
+  C = narrow ? 13 : 27; R = narrow ? 17 : 15;
+  N = C*R;
+  adj = Array.from({length:N}, () => new Set());
+  const seen = new Uint8Array(N), stack = [0]; seen[0] = 1;
+  const nb = i => { const x=i%C, y=(i/C)|0, o=[]; if(x>0)o.push(i-1); if(x<C-1)o.push(i+1); if(y>0)o.push(i-C); if(y<R-1)o.push(i+C); return o; };
+  while(stack.length){
+    const cur = stack[stack.length-1];
+    const opts = nb(cur).filter(j => !seen[j]);
+    if(!opts.length){ stack.pop(); continue; }
+    const j = opts[(Math.random()*opts.length)|0];
+    adj[cur].add(j); adj[j].add(cur); seen[j] = 1; stack.push(j);
+  }
+  // quelques murs retirés : plusieurs routes possibles, le blob doit choisir
+  const extra = Math.floor(N*0.06);
+  for(let k=0;k<extra;k++){
+    const i = (Math.random()*N)|0, o = nb(i), j = o[(Math.random()*o.length)|0];
+    adj[i].add(j); adj[j].add(i);
+  }
+  A = 0; B = N-1;
+  edges = []; nodeEdges = Array.from({length:N}, () => []);
+  for(let i=0;i<N;i++) for(const j of adj[i]) if(j>i){
+    const e = {a:i,b:j,D:0,w:1+Math.random()*0.7};
+    nodeEdges[i].push(e); nodeEdges[j].push(e); edges.push(e);
+  }
+  // temps d'arrivée du front (Dijkstra sur poids bruités = croissance organique)
+  arrive = new Float64Array(N).fill(Infinity); arrive[A] = 0;
+  const done = new Uint8Array(N);
+  for(let it=0; it<N; it++){
+    let u=-1, best=Infinity;
+    for(let i=0;i<N;i++) if(!done[i] && arrive[i]<best){best=arrive[i];u=i;}
+    if(u<0) break; done[u]=1;
+    for(const e of nodeEdges[u]){ const v = e.a===u?e.b:e.a; if(arrive[u]+e.w < arrive[v]) arrive[v] = arrive[u]+e.w; }
+  }
+  maxArrive = 0; for(let i=0;i<N;i++) maxArrive = Math.max(maxArrive, arrive[i]);
+  computeBFS();
+  layout();
+}
+
+function computeBFS(){
+  distA = new Int32Array(N).fill(-1); distA[A]=0;
+  const prev = new Int32Array(N).fill(-1), q=[A];
+  for(let h=0; h<q.length; h++){ const u=q[h]; for(const v of adj[u]) if(distA[v]<0){distA[v]=distA[u]+1; prev[v]=u; q.push(v);} }
+  optPath = []; for(let v=B; v>=0; v=prev[v]) optPath.push(v);
+  $('sOpt').textContent = distA[B];
+}
+
+function layout(){
+  const w = cv.parentElement.clientWidth - 28;
+  cell = Math.max(10, Math.floor((w - 2*pad)/C));
+  const W = cell*C + 2*pad, H = cell*R + 2*pad;
+  const dpr = window.devicePixelRatio || 1;
+  cv.width = W*dpr; cv.height = H*dpr;
+  cv.style.width = W+'px'; cv.style.height = H+'px'; cv.style.maxWidth='100%'; cv.style.height='auto';
+  cv.style.aspectRatio = W+' / '+H;
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+
+function reset(skipExplore){
+  phase = skipExplore ? 'food' : 'explore';
+  T = skipExplore ? maxArrive+3 : 2.5; step = 0; foodTimer = 0; history = []; p = new Float64Array(N);
+  for(const e of edges) e.D = skipExplore ? 0.5 + Math.random()*0.15 : 0;
+  updateSteps();
+}
+
+/* ---------- modèle de Tero et al. (2007) : dD/dt = |Q| - γD ---------- */
+function solvePressure(){
+  // Σ_j D_ij (p_i - p_j) = b_i ; b_A = 1, p_B = 0 (gradient conjugué)
+  const eps = 1e-7;
+  const Ap = (x, out) => {
+    for(let i=0;i<N;i++){
+      if(i===B){ out[i]=0; continue; }
+      let s = eps*x[i];
+      for(const e of nodeEdges[i]){ const j = e.a===i?e.b:e.a; s += e.D*(x[i] - (j===B?0:x[j])); }
+      out[i] = s;
+    }
+  };
+  const r = new Float64Array(N), d = new Float64Array(N), q = new Float64Array(N);
+  p[B] = 0; Ap(p, q);
+  for(let i=0;i<N;i++) r[i] = (i===B?0:((i===A?1:0) - q[i]));
+  d.set(r);
+  let rr = 0; for(let i=0;i<N;i++) rr += r[i]*r[i];
+  for(let it=0; it<400 && rr>1e-14; it++){
+    Ap(d, q);
+    let dq=0; for(let i=0;i<N;i++) dq += d[i]*q[i];
+    const a = rr/dq;
+    for(let i=0;i<N;i++){ p[i]+=a*d[i]; r[i]-=a*q[i]; }
+    let rr2=0; for(let i=0;i<N;i++) rr2 += r[i]*r[i];
+    const bta = rr2/rr; rr = rr2;
+    for(let i=0;i<N;i++) d[i] = r[i] + bta*d[i];
+  }
+}
+
+function teroStep(dt){
+  solvePressure();
+  const deg = new Int32Array(N);
+  for(const e of edges) if(e.D>0.02){ deg[e.a]++; deg[e.b]++; }
+  for(const e of edges){
+    if(e.D<=0) continue;
+    const Q = Math.abs(e.D*(p[e.a]-p[e.b]));
+    const tip = ((deg[e.a]===1 && e.a!==A && e.a!==B) || (deg[e.b]===1 && e.b!==A && e.b!==B)) ? 6 : 0;
+    e.Q = Q;
+    e.D += dt*(Q - (0.55 + tip)*e.D);
+    if(e.D < 1e-4) e.D = 0;
+  }
+  step++;
+}
+
+function liveCount(){ let n=0; for(const e of edges) if(e.D>0.02) n++; return n; }
+
+function checkDone(){
+  let n=0, allFlow=true;
+  for(const e of edges) if(e.D>0.02){ n++; if((e.Q||0) < 0.9) allFlow=false; }
+  if((allFlow && n>0) || step>5000){
+    phase='done'; updateSteps();
+    const ok = n===distA[B];
+    $('result').innerHTML = ok
+      ? `Chemin trouvé : <b>${n} cases</b>, exactement le plus court possible (${distA[B]}). Le blob a abandonné ${Math.max(0, edges.length-n)} segments sur ${edges.length}.`
+      : `Réseau stabilisé : <b>${n} segments</b> pour un plus court chemin de ${distA[B]}. Deux routes de même longueur se partagent parfois le flux, comme chez le vrai Physarum.`;
+  }
+}
+
+/* ---------- boucle ---------- */
+let last = performance.now(), frame = 0;
+function tick(now){
+  const dt = Math.min(0.05, (now-last)/1000); last = now;
+  if(frame++ % 30 === 0) readColors();
+  if(!paused){
+    clock += dt;
+    if(phase==='explore'){
+      T += dt*speed*7;
+      if(T > maxArrive+1.5){ phase='food'; foodTimer=0; for(const e of edges) e.D = 0.5 + Math.random()*0.15; updateSteps(); }
+    } else if(phase==='food'){
+      foodTimer += dt*speed;
+      if(foodTimer>1.4){ phase='adapt'; updateSteps(); $('result').textContent='Le flux se concentre entre A et B ; les impasses se vident.'; }
+    } else if(phase==='adapt'){
+      acc += dt*speed*14;
+      while(acc >= 1){ teroStep(0.2); acc -= 1; }
+      checkDone();
+    }
+    if(frame%6===0 && phase!=='done'){ history.push(phase==='explore' ? exploredCount() : liveCount()); if(history.length>400) history.shift(); drawSpark(); }
+  }
+  draw();
+  updateStats();
+  requestAnimationFrame(tick);
+}
+
+function exploredCount(){ let n=0; for(const e of edges) if(Math.max(arrive[e.a],arrive[e.b])<=T) n++; return n; }
+
+function cx(i){ return pad + (i%C + 0.5)*cell; }
+function cy(i){ return pad + (((i/C)|0) + 0.5)*cell; }
+
+function draw(){
+  const W = cell*C+2*pad, H = cell*R+2*pad;
+  ctx.fillStyle = col.agar; ctx.fillRect(0,0,W,H);
+
+  // plasmode
+  ctx.lineCap='round';
+  const pulse = (i) => reduceMotion ? 0.5 : 0.5+0.5*Math.sin(clock*3.2 - distA[i]*0.55);
+  if(phase==='explore'){
+    for(const e of edges){
+      let s=e.a, t=e.b; if(arrive[s]>arrive[t]){ s=e.b; t=e.a; }
+      if(arrive[s] > T) continue;
+      const f = Math.min(1, (T-arrive[s])/(arrive[t]-arrive[s]||1));
+      const x1=cx(s), y1=cy(s), x2=x1+(cx(t)-x1)*f, y2=y1+(cy(t)-y1)*f;
+      ctx.strokeStyle = col.slime; ctx.globalAlpha = 0.85; ctx.lineWidth = cell*0.3;
+      ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+      if(f<1){ // front en éventail
+        ctx.globalAlpha = 0.55; ctx.fillStyle = col['slime-hi'];
+        ctx.beginPath(); ctx.arc(x2,y2,cell*0.34,0,7); ctx.fill();
+      }
+    }
+    ctx.globalAlpha=1;
+  } else {
+    for(const e of edges){
+      if(e.D<=0.003) continue;
+      const a = Math.min(1, e.D/0.1);
+      const w = cell*(0.06 + 0.5*Math.min(1, Math.pow(e.D/1.8, 0.6)));
+      const pl = (pulse(e.a)+pulse(e.b))/2;
+      ctx.globalAlpha = a*(0.75+0.25*pl);
+      ctx.strokeStyle = pl>0.7 && e.D>0.6 ? col['slime-hi'] : col.slime;
+      ctx.lineWidth = w*(0.92+0.16*pl);
+      ctx.beginPath(); ctx.moveTo(cx(e.a),cy(e.a)); ctx.lineTo(cx(e.b),cy(e.b)); ctx.stroke();
+    }
+    ctx.globalAlpha=1;
+  }
+
+  // plus court chemin (comparaison)
+  if($('showOpt').checked){
+    ctx.strokeStyle = col.navy; ctx.lineWidth = Math.max(1.5, cell*0.08); ctx.setLineDash([cell*0.25, cell*0.2]);
+    ctx.beginPath(); optPath.forEach((v,k)=> k?ctx.lineTo(cx(v),cy(v)):ctx.moveTo(cx(v),cy(v))); ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  // murs
+  ctx.strokeStyle = col.wall; ctx.lineWidth = Math.max(1.5, cell*0.09); ctx.lineCap='square';
+  ctx.beginPath();
+  for(let i=0;i<N;i++){
+    const x=pad+(i%C)*cell, y=pad+((i/C)|0)*cell;
+    if(i%C===C-1 || !adj[i].has(i+1)){ ctx.moveTo(x+cell,y); ctx.lineTo(x+cell,y+cell); }
+    if(((i/C)|0)===R-1 || !adj[i].has(i+C)){ ctx.moveTo(x,y+cell); ctx.lineTo(x+cell,y+cell); }
+    if(i%C===0){ ctx.moveTo(x,y); ctx.lineTo(x,y+cell); }
+    if(i<C){ ctx.moveTo(x,y); ctx.lineTo(x+cell,y); }
+  }
+  ctx.stroke();
+
+  // nourriture
+  const showFood = phase!=='explore';
+  drawFood(A, 'A', true);
+  drawFood(B, 'B', showFood);
+}
+
+function drawFood(i, label, full){
+  const x=cx(i), y=cy(i), r=cell*0.42;
+  if(full){
+    ctx.fillStyle = col.oat; ctx.strokeStyle = col.wall; ctx.lineWidth=1;
+    [[-0.25,-0.1,0.5],[0.22,0.05,-0.6],[0,0.22,1.2]].forEach(([dx,dy,rot])=>{
+      ctx.beginPath(); ctx.ellipse(x+dx*r, y+dy*r, r*0.55, r*0.32, rot, 0, 7); ctx.fill(); ctx.stroke();
+    });
+    if(phase==='food' && !reduceMotion){
+      ctx.strokeStyle = col.slime; ctx.globalAlpha = Math.max(0,1-foodTimer/1.4); ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(x,y,r+foodTimer*cell*1.6,0,7); ctx.stroke(); ctx.globalAlpha=1;
+    }
+  } else {
+    ctx.strokeStyle = col.muted; ctx.setLineDash([3,3]); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.stroke(); ctx.setLineDash([]);
+  }
+  ctx.fillStyle = col.ink; ctx.font = `600 ${Math.max(10,cell*0.45)}px "IBM Plex Mono", monospace`;
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(label, x, y);
+}
+
+function drawSpark(){
+  const svg = $('spark'); if(history.length<2){ svg.innerHTML=''; return; }
+  const mx = Math.max(...history, 1);
+  const pts = history.map((v,k)=>`${(k/(history.length-1))*280},${54 - (v/mx)*50}`).join(' ');
+  svg.innerHTML = `<polygon points="0,56 ${pts} 280,56" fill="${col.slime}" opacity="0.22"/><polyline points="${pts}" fill="none" stroke="${col.slime}" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+  $('sparkMax').textContent = 'max ' + mx;
+}
+
+function updateStats(){
+  const live = phase==='explore' ? exploredCount() : liveCount();
+  $('sTubes').textContent = live;
+  let covered=0; for(let i=0;i<N;i++) if(arrive[i]<=T) covered++;
+  $('sCover').textContent = Math.round(100*covered/N)+' %';
+  $('sTime').textContent = step;
+}
+
+const labels = {explore:'Exploration', food:'Nourriture détectée', adapt:'Renforcement et élagage', done:'Chemin mémorisé'};
+function updateSteps(){
+  $('phaseLabel').textContent = labels[phase];
+  const order = ['explore','food','adapt','done'], k = order.indexOf(phase);
+  document.querySelectorAll('#steps li').forEach(li => {
+    const j = order.indexOf(li.dataset.p);
+    li.classList.toggle('on', j===k); li.classList.toggle('done', j<k || (phase==='done' && j===k));
+  });
+  if(phase==='explore') $('result').textContent = 'Le blob part de A et colonise le labyrinthe.';
+  if(phase==='food') $('result').textContent = 'Toutes les galeries sont couvertes. Nourriture posée en A et B.';
+}
+
+/* ---------- interactions ---------- */
+$('btnNew').onclick = () => { buildMaze(); reset(false); };
+$('btnReplay').onclick = () => reset(false);
+$('btnPause').onclick = (ev) => { paused=!paused; ev.target.textContent = paused?'Reprendre':'Pause'; };
+$('speed').oninput = (ev) => speed = parseFloat(ev.target.value);
+cv.addEventListener('click', ev => {
+  const r = cv.getBoundingClientRect(), sx = (cell*C+2*pad)/r.width;
+  const x = Math.floor(((ev.clientX-r.left)*sx - pad)/cell), y = Math.floor(((ev.clientY-r.top)*sx - pad)/cell);
+  if(x<0||y<0||x>=C||y>=R) return;
+  const i = y*C+x; if(i===A) return;
+  B = i; computeBFS();
+  T = maxArrive+3; reset(true);
+  $('result').textContent = 'Nouvelle source en B : le blob se redéploie dans les galeries et cherche la nouvelle route.';
+});
+let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(layout, 150); });
+
+readColors(); buildMaze(); reset(false);
+requestAnimationFrame(tick);
+})();
+</script>
