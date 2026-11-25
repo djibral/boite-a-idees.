@@ -19,6 +19,16 @@ Le blob ne vise pas B d'un coup. Il avance de source de nourriture en source de 
 | P3 Rentable | 1 000 € de marge nette par mois | Le réseau se finance lui-même |
 | P4 Rythme | 25 000 € de CA par mois | Cadence d'un 300 000 € annuel |
 
+## Contexte (réponses du 25/11/2026)
+
+- **Statut** : micro-entreprise, a priori en franchise de TVA. Demande au greffe d'Antibes refusée, motif à clarifier avant d'encaisser des ventes.
+- **Livraison** (vérifié dans Shopify) : France 7,90 €, Express 10,99 €, offerte dès 100 €. UE 22 €, international 29 €. Printful facture ~7,29 € pour la France.
+- **Comptes** : réseaux au nom de 1paR1.officiel ; Instagram, TikTok et YouTube reliés à Metricool, les autres pas encore.
+- **Catalogue prévu** : t-shirt (~35 €), casquette ; produit numérique « Un pas à la fois » de Coach Ray et Inès (vidéo et/ou bande dessinée).
+- **Budget** : 0 € par mois. Tout passe par les outils gratuits et le contenu organique.
+- **Campagne en cours** : [campagnes/noel-2026.md](./campagnes/noel-2026.md).
+- **Relevé automatique** : chaque lundi matin (tâche planifiée), rapport dans `memoire/releve-AAAA-MM-JJ.md`.
+
 ## Ordre de grandeur (sweat à 69,90 €)
 
 - Marge par sweat avant pub : environ **26 à 33 €** (prix Printful 34,37 à 42 €, moins ~2,30 € de frais de paiement). À confirmer avec le régime de TVA.
